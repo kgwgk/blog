@@ -6,7 +6,7 @@ tags: Combinatorics
 prerequisites: Combinatorics (counting principles), Linear Algebra (eigenvalues)
 ----
 
-This post is to test my `MathJax`/`Typst` integration.  `MathJax` expects
+This post tests my `MathJax`/`Typst` integration.  `MathJax` expects
 `LaTeX`. I prefer `Typst`. `Pandoc` stores math expressions as raw text, so 
 I walk a function $f : "Typst" -> "LaTeX"$ over the `Pandoc` AST 
 then do the remaining compiler passes.
@@ -60,7 +60,7 @@ this formula. We expand the determinant in the last row
 \[ h_n (a,b) =(a+b) h_(n-1) (a,b) - a b dot.c h_(n-2)(a,b). \]
 
 The proof follows from induction on $n$.
-All that must be done is to plug the formula into the recurrence and
+All that must be done is: plug the formula into the recurrence and
 check that it holds. This trick of expanding the determinant into
 a recurrence is common for (tri)-diagonal matrices.
 
