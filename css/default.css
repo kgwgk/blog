@@ -176,7 +176,7 @@ body::before {
   top: calc(var(--header-height, 8rem) + 2rem); /* start just below header */
   bottom: 8rem;              /* end above footer */
   width: 1px;
-  background-color: #888;
+  background-color: var(--border-color);
   z-index: 0;
 }
 
