@@ -7,16 +7,7 @@ maintainer:         hcentner@umich.edu
 author:             Harrison Centner
 category:           Web
 
--- TODO: Before hackage release.
--- A short (one-line) description of the package.
-synopsis:           A template for Haskell projects using Nix
-
--- A longer description of the package.
--- description:
-
--- A URL where users can report bugs.
--- bug-reports:
-
+synopsis:           A blog mostly about software, built with Hakyll
 extra-source-files:
   LICENSE
   README.md

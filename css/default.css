@@ -37,14 +37,13 @@
 
 /* Dark mode — overrides only the colors that need changing */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg-color: #2b2b2b;
     --text-color: #e6e6e6;
     --border-color: #555;
     --code-bg: #4b4b4b;
     --code-text: #e0e0e0;
 
-    /* your accent colors can be kept or adjusted */
     --primary-color: #ff6f91;
     --secondary-color: #e8c84d;
 
@@ -52,6 +51,22 @@
     --medium-grey-color: #c0c0c0;
     --light-grey-color: #aaaaaa;
   }
+}
+
+/* Explicit dark mode toggle override */
+:root[data-theme="dark"] {
+  --bg-color: #2b2b2b;
+  --text-color: #e6e6e6;
+  --border-color: #555;
+  --code-bg: #4b4b4b;
+  --code-text: #e0e0e0;
+
+  --primary-color: #ff6f91;
+  --secondary-color: #e8c84d;
+
+  --dark-grey-color: #e0e0e0;
+  --medium-grey-color: #c0c0c0;
+  --light-grey-color: #aaaaaa;
 }
 
 /* Apply the variables */
@@ -237,6 +252,25 @@ nav {
 nav a {
   margin-bottom: 0.75rem;
   margin-top: 0.75rem;
+}
+
+#theme-toggle {
+  font-family: inherit;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-color);
+  color: var(--dark-grey-color);
+  cursor: pointer;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+#theme-toggle:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 footer {

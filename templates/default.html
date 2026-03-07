@@ -55,6 +55,12 @@
         </script>
         $endif$
 
+        <script>
+         (function() {
+             var t = localStorage.getItem('theme');
+             if (t) document.documentElement.setAttribute('data-theme', t);
+         })();
+        </script>
         <link rel="stylesheet" href="/css/default.css" />
         <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Dosis:400,500,700&display=swap" rel="stylesheet">
@@ -92,6 +98,7 @@
                 <a class="" href="/">Home</a>
                 <a href="/about.html">About</a>
                 <a href="/archive.html">Archive</a>
+                <button id="theme-toggle" aria-label="Toggle dark mode">Dark</button>
             </div>
         </nav>
 
@@ -103,5 +110,41 @@
         <footer>
           $partial("templates/footer.html")$
         </footer>
+        <script>
+         (function() {
+             var toggle = document.getElementById('theme-toggle');
+             var stored = localStorage.getItem('theme');
+
+             function applyTheme(theme) {
+                 if (theme === 'dark') {
+                     document.documentElement.setAttribute('data-theme', 'dark');
+                     toggle.textContent = 'Light';
+                 } else if (theme === 'light') {
+                     document.documentElement.setAttribute('data-theme', 'light');
+                     toggle.textContent = 'Dark';
+                 } else {
+                     document.documentElement.removeAttribute('data-theme');
+                     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                     toggle.textContent = prefersDark ? 'Light' : 'Dark';
+                 }
+             }
+
+             applyTheme(stored);
+
+             toggle.addEventListener('click', function() {
+                 var current = document.documentElement.getAttribute('data-theme');
+                 var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                 if (!current) {
+                     var next = prefersDark ? 'light' : 'dark';
+                 } else {
+                     var next = current === 'dark' ? 'light' : 'dark';
+                 }
+
+                 localStorage.setItem('theme', next);
+                 applyTheme(next);
+             });
+         })();
+        </script>
     </body>
 </html>
