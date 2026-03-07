@@ -77,8 +77,7 @@ body {
 
 /* Borders */
 body::before,
-header.logo,
-header.blog-title,
+body::after,
 footer,
 .sidebar-container,
 .teaser::after {
@@ -175,10 +174,14 @@ html {
 
 body {
   display: grid;
-  grid-template-columns: [left] 16rem [divider] 0rem [content] auto [right];
+  grid-template-columns: [left] 16rem [logo-right] 1fr [right];
   grid-template-rows: [top] auto [content-top] auto [content-bottom] auto [bottom];
   max-width: 80rem;
   margin: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
   font-family: "Computer Modern", "Lora", serif;
   position: relative; /* allow absolute positioning for divider */
 }
@@ -187,7 +190,7 @@ body {
 body::before {
   content: "";
   position: absolute;
-  left: 16rem;               /* aligns with end of left sidebar */
+  left: calc(16rem + 1.5rem); /* aligns with end of left sidebar + body padding */
   top: calc(var(--header-height, 8rem) + 2rem); /* start just below header */
   bottom: 8rem;              /* end above footer */
   width: 1px;
@@ -196,13 +199,11 @@ body::before {
 }
 
 header.logo {
-  border-bottom: 1px solid var(--border-color);
-  grid-column: left / divider;
+  grid-column: left / logo-right;
   grid-row: top / content-top;
   padding-bottom: 1rem;
   justify-self: end;
   margin-top: 1rem;
-  width: 112px;
 }
 
 /* TODO: make logo-container have transparent background */
@@ -210,14 +211,26 @@ header.logo {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  width: 112px;
+  width: fit-content;
+}
+
+.logo-img {
+  width: clamp(5rem, 12vw, 10rem);
 }
 
 header.blog-title {
-  border-bottom: 1px solid var(--border-color);
-  grid-column: content / right;
+  grid-column: logo-right / right;
   grid-row: top / content-top;
   align-self: end;
+}
+
+/* Full-width header underline spanning logo + title */
+body::after {
+  content: "";
+  grid-column: left / right;
+  grid-row: top / content-top;
+  align-self: end;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .blog-title-container {
@@ -226,8 +239,13 @@ header.blog-title {
 }
 
 main {
-  grid-column: divider / right;
+  grid-column: left / right;
   grid-row: content-top / content-bottom;
+  margin-left: 16rem;
+}
+
+main main {
+  margin-left: 0;
 }
 
 .main-container {
@@ -237,13 +255,14 @@ main {
 
 nav {
   text-align: right;
-  grid-column: left / content;
+  grid-column: left / right;
   grid-row: content-top / content-bottom;
+  width: 14rem;
   margin-bottom: 2rem;
 }
 
 .sidebar-container {
-  margin-right: 3rem;
+  margin-right: 1rem;
   margin-top: 2rem;
   display: flex;
   flex-direction: column;
@@ -256,21 +275,24 @@ nav a {
 
 #theme-toggle {
   font-family: inherit;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   text-transform: uppercase;
-  padding: 0.3rem 0.8rem;
-  border: 1px solid var(--border-color);
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--primary-color);
   border-radius: 3px;
-  background: var(--bg-color);
-  color: var(--dark-grey-color);
+  background: none;
+  color: var(--primary-color);
   cursor: pointer;
-  margin-top: 0.75rem;
+  margin-top: auto;
   margin-bottom: 0.75rem;
+  text-decoration: none;
+  width: 6.5ch;
+  text-align: center;
+  align-self: flex-end;
 }
 
 #theme-toggle:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
+  text-decoration: underline;
 }
 
 footer {
@@ -283,7 +305,10 @@ footer {
   grid-row: content-bottom / bottom;
   margin-left: 6rem;
   display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
   justify-content: end;
+  white-space: nowrap;
 }
 
 .footer-box {
@@ -309,7 +334,7 @@ footer {
   content: "";
   padding-bottom: 2rem;
   position: absolute;
-  left: 18.75rem;          /* start the border 3rem from the left */
+  left: calc(18.75rem + 1.5rem);
   right: 0;            /* keep full width minus left offset */
   height: 1px;
   border-bottom: 1px solid var(--border-color);
@@ -352,11 +377,12 @@ nav a {
 }
 
 .blog-title a {
-  font-size: 4.6rem;
+  font-size: clamp(2.4rem, 8vw, 4.6rem);
   font-weight: bold;
   color: var(--primary-color);
   text-decoration: none;
   padding-left: 1rem;
+  white-space: nowrap;
 }
 
 i {
@@ -557,7 +583,7 @@ ol, ul {
 @media (max-width: 54rem) {
   body {
     width: 90vw;
-    grid-template-columns: [left] 12rem [logo-right] auto [right];
+    grid-template-columns: [left] auto [logo-right] 1fr [right];
     grid-template-rows: [top] auto [nav-top] auto [content-top] auto [content-bottom] auto [bottom];
   }
 
@@ -566,27 +592,38 @@ ol, ul {
   }
 
   header.logo {
-    grid-column: left / 2;
     grid-row: top / nav-top;
-    justify-self: end;
+    justify-self: start;
   }
 
   header.blog-title {
-    border-collapse: collapse;
-    grid-column: logo-right / right;
+    grid-row: top / nav-top;
+  }
+
+  .blog-title-container {
+    margin-left: 0.5rem;
+  }
+
+  body::after {
     grid-row: top / nav-top;
   }
 
   nav {
-    grid-column: left / right;
     grid-row: nav-top / content-top;
+    width: auto;
+  }
+
+  main {
+    margin-left: 0;
+    max-width: calc(100vw - 19rem);
   }
 
   .sidebar-container {
     flex-direction: row;
+    align-items: baseline;
     margin-right: 0;
     margin-top: 0;
-    margin-left: 2rem;
+    margin-left: 0;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     margin-bottom: 0rem;
@@ -594,19 +631,37 @@ ol, ul {
     border-top: none;
   }
 
-  nav a {
-    margin-left: 0.75rem;
-    margin-right: 0.75rem;
+  #theme-toggle {
+    margin-left: auto;
+    margin-top: 0;
+    position: relative;
+    top: 2px;
   }
 
-  main {
-    grid-column: left / right;
-    max-width: 90vw;
+  nav a {
+    margin-left: 0;
+    margin-right: 1.5rem;
+  }
+
+  nav a:first-child {
+    margin-left: 0;
   }
 
   .main-container {
     margin-top: 0;
     padding-left: 0rem;
+  }
+
+  article {
+    margin-left: 0;
+  }
+
+  .main-container > ul {
+    margin-left: 0;
+  }
+
+  .teaser {
+    margin-left: 0;
   }
 
   .image-large {
@@ -623,7 +678,7 @@ ol, ul {
 
   footer {
     padding-top: 1rem;
-    margin-left: 2rem;
+    margin-left: 0;
     justify-content: end;
   }
 
@@ -631,8 +686,8 @@ ol, ul {
     content: "";
     padding-bottom: 2rem;
     position: absolute;
-    left: 3rem;          /* start the border 3rem from the left */
-    right: 0;            /* keep full width minus left offset */
+    left: 1.5rem;
+    right: 1.5rem;
     height: 1px;
     border-bottom: 1px solid var(--border-color);
   }
@@ -642,47 +697,10 @@ ol, ul {
 @media (max-width: 32rem) {
   body {
     width: 95vw;
-    grid-template-columns: [left] auto [right];
-    grid-template-rows: [top] auto [logo-bottom] auto [nav-top] auto [content-top] auto [content-bottom] auto [bottom];
-  }
-
-  header.logo {
-    grid-column: left / right;
-    grid-row: top / logo-bottom;
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  .logo-container {
-    justify-content: flex-start;
-  }
-
-  header.blog-title {
-    grid-column: left / right;
-    grid-row: logo-bottom / nav-top;
-  }
-
-  .blog-title a {
-    font-size: 3.4rem;
-    padding-left: 0;
-  }
-
-  .blog-title-container {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    margin-left: 0;
-    text-align: center;
-  }
-
-  nav {
-    grid-column: left / right;
-    grid-row: nav-top / content-top;
   }
 
   .sidebar-container {
-    flex-direction: row;
     justify-content: space-around;
-    margin-left: 0;
   }
 
   nav a {
@@ -691,16 +709,19 @@ ol, ul {
   }
 
   main {
-    grid-column: left / right;
-    max-width: 95vw;
+    max-width: none;
   }
 
   article {
-    margin-left: 1rem;
+    margin-left: 0;
+  }
+
+  .main-container > ul {
+    margin-left: 0;
   }
 
   .teaser {
-    margin-left: -1rem;
+    margin-left: 0;
   }
 
   h1 {
@@ -723,20 +744,31 @@ ol, ul {
     width: 60%;
   }
 
+  .teaser::after {
+    left: 1.5rem;
+    right: 1.5rem;
+  }
+
   footer {
     margin-left: 0;
-    flex-direction: column;
+    justify-content: end;
+    font-size: 1.2rem;
+    padding-left: 0;
+    padding-right: 0;
   }
+
 }
 
 /* Very small phones */
 @media (max-width: 22rem) {
   body {
     width: 98vw;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 
   .blog-title a {
-    font-size: 2.6rem;
+    padding-left: 0.5rem;
   }
 
   nav a {
@@ -762,14 +794,6 @@ ol, ul {
     font-size: 1.6rem;
   }
 
-  article {
-    margin-left: 0.5rem;
-  }
-
-  .teaser {
-    margin-left: -0.5rem;
-  }
-
   .article-body p,
   .article-body ol,
   .article-body ul {
@@ -781,9 +805,18 @@ ol, ul {
     margin-right: 1rem;
   }
 
+  .teaser::after {
+    left: 1.5rem;
+    right: 1.5rem;
+  }
+
   .image-large,
   .image-medium,
   .image-small {
     width: 100%;
+  }
+
+  .footer-logo {
+    display: none;
   }
 }

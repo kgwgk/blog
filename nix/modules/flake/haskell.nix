@@ -31,7 +31,6 @@
         # (Local packages are added automatically)
         /*
         aeson.source = "1.5.0.0" # Hackage version
-        shower.source = inputs.shower; # Flake input
         */
       };
 
@@ -39,7 +38,7 @@
       settings = {
         hcentner-blog = {
           stan = true;
-          # haddock = false;
+          haddock = false;
         };
         /*
         aeson = {

@@ -20,4 +20,8 @@ result-*
 # direnv
 .direnv
 
+
+# wrangler
+node_modules
+
 /.pre-commit-config.yaml

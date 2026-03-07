@@ -1,9 +1,10 @@
-# Configuration for the project's Nix devShell
-# You mostly want the `packages` option below.
+# Configuration for the project's Nix devShells
+# `default` uses haskell-flake + pre-commit (full tooling)
+# `lite` is a lightweight shell with just cabal, GHC, and essentials
 
 {
   perSystem = { config, pkgs, ... }: {
-    # Default shell.
+    # Full shell with haskell-flake and pre-commit hooks.
     devShells.default = pkgs.mkShell {
       name = "hcentner-blog";
       meta.description = "Haskell development environment";
@@ -14,7 +15,6 @@
         config.pre-commit.devShell # See ./nix/modules/formatter.nix
       ];
 
-      # Packages to be added to Nix devShell go here.
       packages = with pkgs; [
         just
         nixd
@@ -22,6 +22,22 @@
         wrangler
         nodejs
         patchelf
+      ];
+    };
+
+    # Lightweight shell — haskell-flake + preview tools, no pre-commit hooks.
+    devShells.lite = pkgs.mkShell {
+      name = "hcentner-blog-lite";
+      meta.description = "Lightweight Haskell dev environment";
+
+      inputsFrom = [
+        config.haskellProjects.default.outputs.devShell
+      ];
+
+      packages = with pkgs; [
+        wrangler
+        nodejs
+        just
       ];
     };
   };

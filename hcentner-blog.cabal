@@ -42,9 +42,7 @@ common shared
     , optics-core
     , pandoc
     , pandoc-types
-    , profunctors
     , relude
-    , shower
     , text
     , time
 
