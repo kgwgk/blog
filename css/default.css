@@ -196,7 +196,7 @@ body::before {
 }
 
 header.logo {
-  border-bottom: 1px solid #888;
+  border-bottom: 1px solid var(--border-color);
   grid-column: left / divider;
   grid-row: top / content-top;
   padding-bottom: 1rem;
@@ -214,7 +214,7 @@ header.logo {
 }
 
 header.blog-title {
-  border-bottom: 1px solid #888;
+  border-bottom: 1px solid var(--border-color);
   grid-column: content / right;
   grid-row: top / content-top;
   align-self: end;
@@ -278,7 +278,7 @@ footer {
   padding-bottom: 3rem;
   padding-left: 1rem;
   padding-right: 1rem;
-  border-top: 1px solid #888;
+  border-top: 1px solid var(--border-color);
   grid-column: left / right;
   grid-row: content-bottom / bottom;
   margin-left: 6rem;
@@ -311,8 +311,8 @@ footer {
   position: absolute;
   left: 18.75rem;          /* start the border 3rem from the left */
   right: 0;            /* keep full width minus left offset */
-  height: 1px;         /* border thickness */
-  border-bottom: 1px solid #888;
+  height: 1px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 /* Styling */
@@ -407,7 +407,6 @@ h4 {
 }
 
 figcaption {
-  font-size: 1.7rem;
   font-size: 1.5rem;
   font-style: italic;
   margin-top: -1rem;
@@ -591,7 +590,7 @@ ol, ul {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     margin-bottom: 0rem;
-    border-bottom: 1px solid #888;
+    border-bottom: 1px solid var(--border-color);
     border-top: none;
   }
 
@@ -612,17 +611,14 @@ ol, ul {
 
   .image-large {
     width: 70%;
-    min-width: 32rem;
   }
 
   .image-medium {
-    width: 45%;
-    min-width: 25rem;
+    width: 50%;
   }
 
   .image-small {
-      width: 33%;
-      min-width: 18rem;
+    width: 35%;
   }
 
   footer {
@@ -637,8 +633,8 @@ ol, ul {
     position: absolute;
     left: 3rem;          /* start the border 3rem from the left */
     right: 0;            /* keep full width minus left offset */
-    height: 1px;         /* border thickness */
-    border-bottom: 1px solid #888;
+    height: 1px;
+    border-bottom: 1px solid var(--border-color);
   }
 }
 
@@ -666,9 +662,15 @@ ol, ul {
     grid-row: logo-bottom / nav-top;
   }
 
+  .blog-title a {
+    font-size: 3.4rem;
+    padding-left: 0;
+  }
+
   .blog-title-container {
     margin-top: 0.5rem;
     margin-bottom: 1rem;
+    margin-left: 0;
     text-align: center;
   }
 
@@ -680,6 +682,7 @@ ol, ul {
   .sidebar-container {
     flex-direction: row;
     justify-content: space-around;
+    margin-left: 0;
   }
 
   nav a {
@@ -690,5 +693,97 @@ ol, ul {
   main {
     grid-column: left / right;
     max-width: 95vw;
+  }
+
+  article {
+    margin-left: 1rem;
+  }
+
+  .teaser {
+    margin-left: -1rem;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  h2 {
+    font-size: 2.2rem;
+  }
+
+  .image-large {
+    width: 90%;
+  }
+
+  .image-medium {
+    width: 80%;
+  }
+
+  .image-small {
+    width: 60%;
+  }
+
+  footer {
+    margin-left: 0;
+    flex-direction: column;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 22rem) {
+  body {
+    width: 98vw;
+  }
+
+  .blog-title a {
+    font-size: 2.6rem;
+  }
+
+  nav a {
+    font-size: 1.5rem;
+    margin-left: 0.3rem;
+    margin-right: 0.3rem;
+  }
+
+  #theme-toggle {
+    font-size: 1.2rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  h3 {
+    font-size: 1.6rem;
+  }
+
+  article {
+    margin-left: 0.5rem;
+  }
+
+  .teaser {
+    margin-left: -0.5rem;
+  }
+
+  .article-body p,
+  .article-body ol,
+  .article-body ul {
+    font-size: 1.3rem;
+  }
+
+  figcaption {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .image-large,
+  .image-medium,
+  .image-small {
+    width: 100%;
   }
 }
