@@ -31,3 +31,7 @@ bun.lock
 
 /.pre-commit-config.yaml
 .worktrees
+
+# wasm build artifacts
+wasm/
+frontend/dist/

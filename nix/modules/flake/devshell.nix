@@ -9,7 +9,7 @@
         pname = "hcentner-blog-worker-deps";
         version = "0.1.0";
         src = ../../..;
-        npmDepsHash = "sha256-s0u7sgPJedoRFYXSRkJXrufwyvA0+OmRcOucw+aWR+I=";
+        npmDepsHash = "sha256-XNGq4BnzzwI+9BA0d0bgKyi0bZAx8SCBiAa26P4UqO4=";
         dontNpmBuild = true;
       };
     in

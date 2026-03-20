@@ -1,5 +1,15 @@
 {
   description = "Nix template for Haskell projects";
+
+  nixConfig = {
+    extra-substituters = [
+      "https://miso-haskell.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "miso-haskell.cachix.org-1:6N2DooyFlZOHUfJtAx1Q09H0P5XXYzoxxQYiwn6W1e8="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -10,6 +20,8 @@
 
     git-hooks.url = "github:cachix/git-hooks.nix";
     git-hooks.flake = false;
+
+    ghc-wasm-meta.url = "gitlab:haskell-wasm/ghc-wasm-meta?host=gitlab.haskell.org";
   };
 
   outputs = inputs:

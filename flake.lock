@@ -20,6 +20,24 @@
         "type": "github"
       }
     },
+    "flake-utils": {
+      "inputs": {
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "fourmolu-nix": {
       "locked": {
         "lastModified": 1707266073,
@@ -33,6 +51,27 @@
         "owner": "jedimahdi",
         "repo": "fourmolu-nix",
         "type": "github"
+      }
+    },
+    "ghc-wasm-meta": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "host": "gitlab.haskell.org",
+        "lastModified": 1773434424,
+        "narHash": "sha256-1RHP174kGsVVVjEXHN/Kf6S7Uy8uGWZt8fRu7X9MvRk=",
+        "owner": "haskell-wasm",
+        "repo": "ghc-wasm-meta",
+        "rev": "c662c34d608dc9d2ff599b007f2e3c46138efaab",
+        "type": "gitlab"
+      },
+      "original": {
+        "host": "gitlab.haskell.org",
+        "owner": "haskell-wasm",
+        "repo": "ghc-wasm-meta",
+        "type": "gitlab"
       }
     },
     "git-hooks": {
@@ -83,6 +122,22 @@
     },
     "nixpkgs": {
       "locked": {
+        "lastModified": 1773282714,
+        "narHash": "sha256-at2PNNVNoTfXBe3bA6pgff+CKOwdBWUZCUBIfXGrXsU=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "a8556879c286b4a40a717a416ae61818c26d1ac8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
         "lastModified": 1760349414,
         "narHash": "sha256-W4Ri1ZwYuNcBzqQQa7NnWfrv0wHMo7rduTWjIeU9dZk=",
         "owner": "nixos",
@@ -101,10 +156,26 @@
       "inputs": {
         "flake-parts": "flake-parts",
         "fourmolu-nix": "fourmolu-nix",
+        "ghc-wasm-meta": "ghc-wasm-meta",
         "git-hooks": "git-hooks",
         "haskell-flake": "haskell-flake",
         "nixos-unified": "nixos-unified",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs_2"
+      }
+    },
+    "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
       }
     }
   },

@@ -113,7 +113,7 @@ just seed-admin <password> <email>
 
 ## Version Control
 
-This project uses **jj** (Jujutsu) for version control. Do not use raw git commands — use `jj` instead.
+This project uses **jj** (Jujutsu) for version control. Do not use raw git commands — use `jj` instead. **Do not run any version control operations (commits, branches, etc.) unless explicitly asked.** Only the user manages version control.
 
 ## Build and CI
 
