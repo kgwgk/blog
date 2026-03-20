@@ -1,0 +1,16 @@
+{
+  "name": "hcentner-blog-worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "hash-wasm": "^4.11.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "0.13.2",
+    "vitest": "^4.1.0"
+  }
+}

@@ -20,8 +20,13 @@ result-*
 # direnv
 .direnv
 
+# claude
+docs
 
 # wrangler
 node_modules
+.dev.vars
+.wrangler
 
 /.pre-commit-config.yaml
+.worktrees

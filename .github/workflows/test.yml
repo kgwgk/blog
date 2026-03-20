@@ -1,0 +1,30 @@
+name: Worker Tests
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "worker/**"
+      - "vitest.config.mjs"
+      - "package.json"
+      - ".github/workflows/test.yml"
+
+jobs:
+  test:
+    runs-on: nixos-zylphia
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: nix shell nixpkgs#nodejs_22 -c npm ci
+
+      - name: Patch workerd for NixOS
+        run: |
+          INTERP=$(nix eval --raw nixpkgs#glibc)/lib/ld-linux-x86-64.so.2
+          patchelf --set-interpreter "$INTERP" node_modules/@cloudflare/workerd-linux-64/bin/workerd
+
+      - name: Create .dev.vars for test secrets
+        run: printf 'COOKIE_SECRET=ci-test-cookie-secret\nHASH_PEPPER=ci-test-hash-pepper\nRESEND_API_KEY=re_test_dummy\n' > .dev.vars
+
+      - name: Run tests
+        run: nix shell nixpkgs#nodejs_22 -c npm test
