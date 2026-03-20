@@ -6,15 +6,19 @@ build-type:    Simple
 common wasm
   if arch(wasm32)
     ghc-options:
-      -no-hs-main
-      -optl-mexec-model=reactor
-      "-optl-Wl,--export=hs_start"
+      -no-hs-main -optl-mexec-model=reactor "-optl-Wl,--export=hs_start"
+
     cpp-options: -DWASM
 
 executable counter
   import:           wasm
   main-is:          Main.hs
   hs-source-dirs:   app
-  build-depends:    base <5, containers, miso >=1.8, mtl
+  build-depends:
+    , base        <5
+    , containers
+    , miso        >=1.8
+    , mtl
+
   default-language: GHC2021
   ghc-options:      -O2 -Wall

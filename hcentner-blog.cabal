@@ -6,7 +6,6 @@ copyright:          2025 Harrison Centner
 maintainer:         hcentner@umich.edu
 author:             Harrison Centner
 category:           Web
-
 synopsis:           A blog mostly about software, built with Hakyll
 extra-source-files:
   LICENSE

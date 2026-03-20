@@ -64,10 +64,14 @@ export function registerPage(success = false, error = null) {
     ${scripts}
 </body>
 </html>`,
-    { status: 200, headers: { "Content-Type": "text/html;charset=UTF-8" } }
+    { status: 200, headers: { "Content-Type": "text/html;charset=UTF-8" } },
   );
 }
 
 function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }

@@ -62,7 +62,7 @@ export async function adminPage(env, message = null) {
     ${adminResetPasswordScript()}
 </body>
 </html>`,
-    { status: 200, headers: { "Content-Type": "text/html;charset=UTF-8" } }
+    { status: 200, headers: { "Content-Type": "text/html;charset=UTF-8" } },
   );
 }
 
@@ -193,5 +193,9 @@ function adminResetPasswordScript() {
 }
 
 function escapeHtml(str) {
-  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }

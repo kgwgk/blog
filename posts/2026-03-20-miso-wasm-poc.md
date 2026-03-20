@@ -1,6 +1,6 @@
 ---
 title: Miso WASM Proof of Concept
-tags: haskell, wasm
+tags: Haskell, WASM
 ---
 
 Interactive counter compiled from Haskell to WebAssembly using [Miso](https://haskell-miso.org/).

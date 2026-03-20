@@ -14,46 +14,46 @@
       };
     in
     {
-    # Full shell with haskell-flake and pre-commit hooks.
-    devShells.default = pkgs.mkShell {
-      name = "hcentner-blog";
-      meta.description = "Haskell development environment";
+      # Full shell with haskell-flake and pre-commit hooks.
+      devShells.default = pkgs.mkShell {
+        name = "hcentner-blog";
+        meta.description = "Haskell development environment";
 
-      # See https://community.flake.parts/haskell-flake/devshell#composing-devshells
-      inputsFrom = [
-        config.haskellProjects.default.outputs.devShell # See ./nix/modules/haskell.nix
-        config.pre-commit.devShell # See ./nix/modules/formatter.nix
-      ];
+        # See https://community.flake.parts/haskell-flake/devshell#composing-devshells
+        inputsFrom = [
+          config.haskellProjects.default.outputs.devShell # See ./nix/modules/haskell.nix
+          config.pre-commit.devShell # See ./nix/modules/formatter.nix
+        ];
 
-      packages = with pkgs; [
-        nixd
-        ghciwatch
-        wrangler
-        nodejs
-        patchelf
-      ];
+        packages = with pkgs; [
+          nixd
+          ghciwatch
+          wrangler
+          nodejs
+          patchelf
+        ];
 
-      shellHook = ''
-        if [ ! -e node_modules ]; then
-          cp -r ${workerDeps}/lib/node_modules/hcentner-blog-worker/node_modules .
-          chmod -R u+w node_modules
-        fi
-      '';
+        shellHook = ''
+          if [ ! -e node_modules ]; then
+            cp -r ${workerDeps}/lib/node_modules/hcentner-blog-worker/node_modules .
+            chmod -R u+w node_modules
+          fi
+        '';
+      };
+
+      # Lightweight shell — haskell-flake + preview tools, no pre-commit hooks.
+      devShells.lite = pkgs.mkShell {
+        name = "hcentner-blog-lite";
+        meta.description = "Lightweight dev environment";
+
+        inputsFrom = [
+          config.haskellProjects.default.outputs.devShell
+        ];
+
+        packages = with pkgs; [
+          wrangler
+          nodejs
+        ];
+      };
     };
-
-    # Lightweight shell — haskell-flake + preview tools, no pre-commit hooks.
-    devShells.lite = pkgs.mkShell {
-      name = "hcentner-blog-lite";
-      meta.description = "Lightweight dev environment";
-
-      inputsFrom = [
-        config.haskellProjects.default.outputs.devShell
-      ];
-
-      packages = with pkgs; [
-        wrangler
-        nodejs
-      ];
-    };
-  };
 }

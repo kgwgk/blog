@@ -8,7 +8,7 @@ const [password, email, hashPepper] = process.argv.slice(2);
 
 if (!password || !email || !hashPepper) {
   console.error(
-    "Usage: node worker/scripts/seed-admin.js <password> <email> <hash_pepper>"
+    "Usage: node worker/scripts/seed-admin.js <password> <email> <hash_pepper>",
   );
   process.exit(1);
 }
@@ -17,7 +17,7 @@ if (!password || !email || !hashPepper) {
 const enc = new TextEncoder();
 const saltBuf = await crypto.subtle.digest(
   "SHA-256",
-  enc.encode("hcentner.dev:admin")
+  enc.encode("hcentner.dev:admin"),
 );
 const salt = new Uint8Array(saltBuf).slice(0, 16);
 
@@ -38,7 +38,7 @@ const hmacKey = await crypto.subtle.importKey(
   enc.encode(hashPepper),
   { name: "HMAC", hash: "SHA-256" },
   false,
-  ["sign"]
+  ["sign"],
 );
 const sig = await crypto.subtle.sign("HMAC", hmacKey, enc.encode(clientHash));
 const bytes = new Uint8Array(sig);

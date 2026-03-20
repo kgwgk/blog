@@ -30,7 +30,7 @@ async function seedUser(username, email, status = "approved") {
   };
   await env.HCENTNER_BLOG_AUTH_USERS.put(
     `user:${username}`,
-    JSON.stringify(record)
+    JSON.stringify(record),
   );
 }
 
@@ -80,7 +80,7 @@ describe("POST /auth/forgot-password", () => {
     expect(resp.status).toBe(200);
     const html = await resp.text();
     expect(html).toContain(
-      "If an account with that username exists, a password reset email has been sent."
+      "If an account with that username exists, a password reset email has been sent.",
     );
 
     // Verify token was created
@@ -101,7 +101,7 @@ describe("POST /auth/forgot-password", () => {
     expect(resp.status).toBe(200);
     const html = await resp.text();
     expect(html).toContain(
-      "If an account with that username exists, a password reset email has been sent."
+      "If an account with that username exists, a password reset email has been sent.",
     );
 
     // Verify no token was created
@@ -122,7 +122,7 @@ describe("POST /auth/forgot-password", () => {
     };
     await env.HCENTNER_BLOG_AUTH_USERS.put(
       "user:noemail",
-      JSON.stringify(record)
+      JSON.stringify(record),
     );
 
     const resp = await postForm("/auth/forgot-password", {
@@ -211,7 +211,7 @@ describe("GET /reset-password", () => {
     const token = "a".repeat(64);
     await env.RESET_TOKENS.put(
       `reset:${token}`,
-      JSON.stringify({ username: "alice", createdAt: Date.now() })
+      JSON.stringify({ username: "alice", createdAt: Date.now() }),
     );
 
     const resp = await request(`/reset-password?token=${token}`);
@@ -271,13 +271,13 @@ describe("POST /auth/reset-password", () => {
     await seedUser("charlie", "charlie@example.com");
     const originalUser = await env.HCENTNER_BLOG_AUTH_USERS.get(
       "user:charlie",
-      "json"
+      "json",
     );
 
     const token = "b".repeat(64);
     await env.RESET_TOKENS.put(
       `reset:${token}`,
-      JSON.stringify({ username: "charlie", createdAt: Date.now() })
+      JSON.stringify({ username: "charlie", createdAt: Date.now() }),
     );
 
     const resp = await postForm("/auth/reset-password", {
@@ -291,7 +291,7 @@ describe("POST /auth/reset-password", () => {
     // Verify password was updated
     const updatedUser = await env.HCENTNER_BLOG_AUTH_USERS.get(
       "user:charlie",
-      "json"
+      "json",
     );
     expect(updatedUser.hashedPassword).not.toBe(originalUser.hashedPassword);
 
@@ -306,7 +306,7 @@ describe("POST /auth/reset-password", () => {
     const token = "c".repeat(64);
     await env.RESET_TOKENS.put(
       `reset:${token}`,
-      JSON.stringify({ username: "dave", createdAt: Date.now() })
+      JSON.stringify({ username: "dave", createdAt: Date.now() }),
     );
 
     // First use succeeds
@@ -330,7 +330,7 @@ describe("POST /auth/reset-password", () => {
     const token = "d".repeat(64);
     await env.RESET_TOKENS.put(
       `reset:${token}`,
-      JSON.stringify({ username: "ghost", createdAt: Date.now() })
+      JSON.stringify({ username: "ghost", createdAt: Date.now() }),
     );
 
     const resp = await postForm("/auth/reset-password", {
