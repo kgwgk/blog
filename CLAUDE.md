@@ -111,7 +111,12 @@ wrangler secret put RESEND_API_KEY
 just seed-admin <password> <email>
 ```
 
+## Version Control
+
+This project uses **jj** (Jujutsu) for version control. Do not use raw git commands — use `jj` instead.
+
 ## Build and CI
 
 - The `PROD` env var controls production-specific behavior (e.g., analytics)
 - Site deploys to hcentner.dev (Cloudflare, via wrangler)
+- Worker tests run in CI via GitHub Actions on a NixOS self-hosted runner (`nixos-zylphia`) in the `nixos-restricted` runner group. There are no ubuntu-latest or macos runners available.
