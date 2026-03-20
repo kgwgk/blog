@@ -22,7 +22,7 @@ jobs:
       - name: Patch workerd for NixOS
         run: |
           INTERP=$(nix eval --raw nixpkgs#glibc)/lib/ld-linux-x86-64.so.2
-          patchelf --set-interpreter "$INTERP" node_modules/@cloudflare/workerd-linux-64/bin/workerd
+          nix shell nixpkgs#patchelf -c patchelf --set-interpreter "$INTERP" node_modules/@cloudflare/workerd-linux-64/bin/workerd
 
       - name: Create .dev.vars for test secrets
         run: printf 'COOKIE_SECRET=ci-test-cookie-secret\nHASH_PEPPER=ci-test-hash-pepper\nRESEND_API_KEY=re_test_dummy\n' > .dev.vars

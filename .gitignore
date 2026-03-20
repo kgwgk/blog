@@ -27,6 +27,7 @@ docs
 node_modules
 .dev.vars
 .wrangler
+bun.lock
 
 /.pre-commit-config.yaml
 .worktrees
