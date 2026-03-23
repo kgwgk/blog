@@ -8,6 +8,6 @@ export default defineConfig({
     }),
   ],
   test: {
-    dir: "worker/test",
+    dir: "./test",
   },
 });

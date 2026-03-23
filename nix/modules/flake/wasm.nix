@@ -51,17 +51,17 @@
       siteContent = lib.fileset.toSource {
         inherit root;
         fileset = lib.fileset.unions [
-          (root + /posts)
-          (root + /templates)
-          (root + /css)
-          (root + /images)
-          (root + /js)
-          (root + /about)
-          (root + /about.html)
-          (root + /index.html)
-          (root + /CNAME)
-          (root + /favicon.ico)
-          (root + /robots.txt)
+          (root + /static/posts)
+          (root + /static/templates)
+          (root + /static/css)
+          (root + /static/images)
+          (root + /static/js)
+          (root + /static/about)
+          (root + /static/about.html)
+          (root + /static/index.html)
+          (root + /static/CNAME)
+          (root + /static/favicon.ico)
+          (root + /static/robots.txt)
         ];
       };
     in
@@ -81,6 +81,8 @@
         LOCALE_ARCHIVE = "${pkgs.glibcLocales}/lib/locale/locale-archive";
 
         buildPhase = ''
+          cd static
+
           # Copy WASM artifacts into place before Hakyll build
           mkdir -p wasm
           cp ${frontendWasm}/counter.wasm wasm/

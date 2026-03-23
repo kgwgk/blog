@@ -4,43 +4,43 @@ Personal blog at [hcentner.dev](https://hcentner.dev), built with Hakyll (Haskel
 
 ## Project Structure
 
-- `src/site.hs` - Main Hakyll site generator (single source file)
-- `posts/` - Blog posts in Markdown (named `YYYY-MM-DD-slug.md`)
-- `templates/` - Hakyll HTML templates (`default.html` is the base layout)
-- `css/default.css` - Site stylesheet
-- `images/` - Static images
-- `nix/modules/flake/` - Nix flake modules (devshell, haskell-flake, pre-commit)
-- `_site/` - Generated output (do not edit)
+- `static/` - Hakyll site generator and content
+  - `static/src/site.hs` - Main Hakyll site generator (single source file)
+  - `static/hcentner-blog.cabal` - Cabal project file
+  - `static/posts/` - Blog posts in Markdown (named `YYYY-MM-DD-slug.md`)
+  - `static/templates/` - Hakyll HTML templates (`default.html` is the base layout)
+  - `static/css/default.css` - Site stylesheet
+  - `static/images/` - Static images
+  - `static/_site/` - Generated output (do not edit)
 - `worker/` - Cloudflare Worker for authentication (see below)
-- `package.json` / `package-lock.json` - npm deps for `hash-wasm` (used by seed script and client-side hashing)
+  - `worker/wrangler.jsonc` - Wrangler config
+  - `worker/package.json` / `worker/package-lock.json` - npm deps for `hash-wasm`
+  - `worker/vitest.config.mjs` - Test config
+- `nix/modules/flake/` - Nix flake modules (devshell, haskell-flake, pre-commit)
 
 ## Development
 
 ### Environment Setup
 
 ```sh
-nix develop        # Full dev shell (includes pre-commit hooks, ghciwatch, just, wrangler)
+nix develop        # Full dev shell (includes pre-commit hooks, ghciwatch, wrangler)
 nix develop .#lite # Lightweight shell (no pre-commit hooks)
 ```
 
-The full dev shell auto-copies `node_modules` from a Nix `buildNpmPackage` derivation (defined in `devshell.nix`). If you update `package.json`, regenerate the lockfile and update `npmDepsHash`:
+The full dev shell auto-copies `node_modules` into `worker/` from a Nix `buildNpmPackage` derivation (defined in `devshell.nix`). If you update `worker/package.json`, regenerate the lockfile and update `npmDepsHash`:
 
 ```sh
-nix shell nixpkgs#nodejs_22 -c npm install --package-lock-only
-nix shell nixpkgs#prefetch-npm-deps -c prefetch-npm-deps package-lock.json
+cd worker && nix shell nixpkgs#nodejs_22 -c npm install --package-lock-only
+nix shell nixpkgs#prefetch-npm-deps -c prefetch-npm-deps worker/package-lock.json
 ```
 
 ### Common Commands
 
 ```sh
-just run           # Build and serve site via ghcid (auto-recompile)
-just repl          # cabal repl
-just docs          # Local hoogle on port 8888
-just dev           # Run wrangler dev server (worker + static assets)
-just deploy        # Build site and deploy to Cloudflare
-cabal build        # Build the site generator
-cabal run site -- build   # Generate the site
-cabal run site -- watch   # Serve with live reload
+cd static && cabal build        # Build the site generator
+cd static && cabal run site -- build   # Generate the site
+cd static && cabal run site -- watch   # Serve with live reload
+cd worker && npx wrangler dev          # Run wrangler dev server (worker + static assets)
 ```
 
 ### Formatting and Linting
@@ -56,7 +56,7 @@ Manual formatting: `./fmt.sh`
 ## Code Conventions
 
 - **Prelude**: Uses `relude` (NoImplicitPrelude) instead of base Prelude
-- **Language**: GHC2021 with extensions defined in `hcentner-blog.cabal` `shared` stanza (OverloadedStrings, StrictData, DerivingStrategies, LambdaCase, etc.)
+- **Language**: GHC2021 with extensions defined in `static/hcentner-blog.cabal` `shared` stanza (OverloadedStrings, StrictData, DerivingStrategies, LambdaCase, etc.)
 - **Fourmolu style**: 2-space indentation, leading comma style, record brace space
 - **GHC warnings**: `-Wall -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-deriving-strategies`
 - **Math rendering**: Inline Typst math in posts is converted to TeX for MathJax
@@ -108,7 +108,7 @@ wrangler kv namespace create RESET_TOKENS --preview
 wrangler secret put COOKIE_SECRET
 wrangler secret put HASH_PEPPER
 wrangler secret put RESEND_API_KEY
-just seed-admin <password> <email>
+cd worker && node scripts/seed-admin.js <password> <email>
 ```
 
 ## Version Control

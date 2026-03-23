@@ -1,12 +1,13 @@
 # cabal
-dist
-dist-*
-cabal.project.local
-cabal.project.local~
+static/dist
+static/dist-*
+static/cabal.project.local
+static/cabal.project.local~
+**/dist-newstyle
 
 # hakyll
-_cache
-_site
+static/_cache
+static/_site
 
 # nix
 result
@@ -24,14 +25,14 @@ result-*
 docs
 
 # wrangler
-node_modules
+**/node_modules
 .dev.vars
 .wrangler
-bun.lock
+worker/bun.lock
 
 /.pre-commit-config.yaml
 .worktrees
 
 # wasm build artifacts
-wasm/
+static/wasm/
 frontend/dist/

@@ -8,7 +8,7 @@
       workerDeps = pkgs.buildNpmPackage {
         pname = "hcentner-blog-worker-deps";
         version = "0.1.0";
-        src = ../../..;
+        src = ../../../worker;
         npmDepsHash = "sha256-XNGq4BnzzwI+9BA0d0bgKyi0bZAx8SCBiAa26P4UqO4=";
         dontNpmBuild = true;
       };
@@ -34,9 +34,9 @@
         ];
 
         shellHook = ''
-          if [ ! -e node_modules ]; then
-            cp -r ${workerDeps}/lib/node_modules/hcentner-blog-worker/node_modules .
-            chmod -R u+w node_modules
+          if [ ! -e worker/node_modules ]; then
+            cp -r ${workerDeps}/lib/node_modules/hcentner-blog-worker/node_modules worker/
+            chmod -R u+w worker/node_modules
           fi
         '';
       };

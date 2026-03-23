@@ -13,12 +13,10 @@
       # To avoid unnecessary rebuilds, we filter projectRoot:
       # https://community.flake.parts/haskell-flake/local#rebuild
       projectRoot = builtins.toString (lib.fileset.toSource {
-        inherit root;
+        root = root + /static;
         fileset = lib.fileset.unions [
-          (root + /src)
-          (root + /hcentner-blog.cabal)
-          (root + /LICENSE)
-          (root + /README.md)
+          (root + /static/src)
+          (root + /static/hcentner-blog.cabal)
         ];
       });
 

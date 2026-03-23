@@ -8,8 +8,6 @@ author:             Harrison Centner
 category:           Web
 synopsis:           A blog mostly about software, built with Hakyll
 extra-source-files:
-  LICENSE
-  README.md
 
 common shared
   ghc-options:
