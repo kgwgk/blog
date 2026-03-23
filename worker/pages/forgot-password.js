@@ -40,10 +40,12 @@ export function forgotPasswordPage(success = false, error = null) {
       nav() +
       '    <main role="main">' +
       '        <div class="main-container">' +
+      "          <article>" +
       "            <h1>Forgot Password</h1>" +
       messageHtml +
       formHtml +
       '            <p class="auth-link"><a href="/login">Back to login</a></p>' +
+      "          </article>" +
       "        </div>" +
       "    </main>" +
       themeToggleScript() +

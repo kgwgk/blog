@@ -23,6 +23,7 @@ export function loginPage(error = null, redirect = "/") {
       nav() +
       '    <main role="main">' +
       '        <div class="main-container">' +
+      "          <article>" +
       "            <h1>Login</h1>" +
       errorHtml +
       '            <form class="auth-form" id="login-form">' +
@@ -38,9 +39,11 @@ export function loginPage(error = null, redirect = "/") {
       "            </form>" +
       '            <p class="auth-link"><a href="/forgot-password">Forgot password?</a></p>' +
       '            <p class="auth-link"><a href="/register">Don\'t have an account? Register</a></p>' +
+      "          </article>" +
       "        </div>" +
       "    </main>" +
       themeToggleScript() +
+      passwordToggleScript() +
       hashWasmScript() +
       clientHashScript("/auth/login") +
       "</body>" +
@@ -89,16 +92,25 @@ export function authStyles() {
     "  background: var(--bg-color); color: var(--text-color);" +
     "  box-sizing: border-box; margin-bottom: 1rem;" +
     "}" +
-    ".auth-form button {" +
+    '.auth-form button[type="submit"] {' +
     '  font-family: "Dosis", sans-serif; font-size: 1.6rem; text-transform: uppercase;' +
     "  padding: 0.5rem 1.5rem; border: 1px solid var(--primary-color); border-radius: 3px;" +
     "  background: none; color: var(--primary-color); cursor: pointer;" +
     "}" +
-    ".auth-form button:hover { text-decoration: underline; }" +
-    ".auth-form button:disabled { opacity: 0.5; cursor: wait; }" +
+    '.auth-form button[type="submit"]:hover { text-decoration: underline; }' +
+    '.auth-form button[type="submit"]:disabled { opacity: 0.5; cursor: wait; }' +
     ".auth-error { color: #c0392b; font-size: 1.4rem; margin-bottom: 1rem; }" +
     ".auth-success { color: #27ae60; font-size: 1.4rem; margin-bottom: 1rem; }" +
     ".auth-link { font-size: 1.4rem; margin-top: 1rem; }" +
+    ".password-wrapper { position: relative; margin-bottom: 1rem; }" +
+    ".password-wrapper input { padding-right: 3rem; margin-bottom: 0; }" +
+    ".password-toggle {" +
+    "  position: absolute; right: 0.5rem; top: 0;" +
+    "  background: none; border: none; cursor: pointer; padding: 0;" +
+    "  color: var(--light-grey-color);" +
+    "  display: flex; align-items: center;" +
+    "}" +
+    ".password-toggle:hover { color: var(--dark-grey-color); }" +
     "</style>"
   );
 }
@@ -127,7 +139,6 @@ export function nav() {
     '        <a href="/">Home</a>' +
     '        <a href="/about.html">About</a>' +
     '        <a href="/archive.html">Archive</a>' +
-    '        <a href="/members/">Members</a>' +
     '        <button id="theme-toggle" aria-label="Toggle dark mode">Dark</button>' +
     "    </div>" +
     "</nav>"
@@ -220,6 +231,39 @@ export function clientHashScript(action) {
     "      btn.disabled = false;" +
     "      btn.textContent = origText;" +
     "    }" +
+    "  });" +
+    "})();" +
+    "</script>"
+  );
+}
+
+export function passwordToggleScript() {
+  return (
+    "<script>" +
+    "(function() {" +
+    "  document.querySelectorAll('.auth-form input[type=\"password\"]').forEach(function(input) {" +
+    "    var wrapper = document.createElement('div');" +
+    "    wrapper.className = 'password-wrapper';" +
+    "    input.parentNode.insertBefore(wrapper, input);" +
+    "    wrapper.appendChild(input);" +
+    "    var btn = document.createElement('button');" +
+    "    btn.type = 'button';" +
+    "    btn.className = 'password-toggle';" +
+    "    btn.setAttribute('aria-label', 'Toggle password visibility');" +
+    "    var eyeOpen = '<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>';" +
+    "    var eyeClosed = '<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24\"/><line x1=\"1\" y1=\"1\" x2=\"23\" y2=\"23\"/></svg>';" +
+    "    btn.innerHTML = eyeClosed;" +
+    "    btn.addEventListener('click', function() {" +
+    "      if (input.type === 'password') {" +
+    "        input.type = 'text';" +
+    "        btn.innerHTML = eyeOpen;" +
+    "      } else {" +
+    "        input.type = 'password';" +
+    "        btn.innerHTML = eyeClosed;" +
+    "      }" +
+    "    });" +
+    "    btn.style.height = input.offsetHeight + 'px';" +
+    "    wrapper.appendChild(btn);" +
     "  });" +
     "})();" +
     "</script>"

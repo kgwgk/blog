@@ -7,6 +7,7 @@ import {
   themeToggleScript,
   hashWasmScript,
   escapeHtml,
+  passwordToggleScript,
 } from "./login.js";
 
 export function resetPasswordPage(token, username, error = null) {
@@ -31,6 +32,7 @@ export function resetPasswordPage(token, username, error = null) {
       nav() +
       '    <main role="main">' +
       '        <div class="main-container">' +
+      "          <article>" +
       "            <h1>Reset Password</h1>" +
       errorHtml +
       '            <form class="auth-form" id="reset-form">' +
@@ -50,9 +52,11 @@ export function resetPasswordPage(token, username, error = null) {
       '                <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password" />' +
       '                <button type="submit">Reset Password</button>' +
       "            </form>" +
+      "          </article>" +
       "        </div>" +
       "    </main>" +
       themeToggleScript() +
+      passwordToggleScript() +
       hashWasmScript() +
       resetHashScript() +
       "</body>" +
@@ -81,9 +85,11 @@ export function resetPasswordExpiredPage() {
       nav() +
       '    <main role="main">' +
       '        <div class="main-container">' +
+      "          <article>" +
       "            <h1>Reset Password</h1>" +
       '            <p class="auth-error">This reset link is invalid or has expired.</p>' +
       '            <p class="auth-link"><a href="/forgot-password">Request a new reset link</a></p>' +
+      "          </article>" +
       "        </div>" +
       "    </main>" +
       themeToggleScript() +
@@ -110,9 +116,11 @@ export function resetPasswordSuccessPage() {
       nav() +
       '    <main role="main">' +
       '        <div class="main-container">' +
+      "          <article>" +
       "            <h1>Password Reset</h1>" +
       '            <p class="auth-success">Your password has been reset successfully.</p>' +
       '            <p class="auth-link"><a href="/login">Go to login</a></p>' +
+      "          </article>" +
       "        </div>" +
       "    </main>" +
       themeToggleScript() +

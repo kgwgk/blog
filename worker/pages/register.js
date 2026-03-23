@@ -7,6 +7,7 @@ import {
   themeToggleScript,
   hashWasmScript,
   clientHashScript,
+  passwordToggleScript,
 } from "./login.js";
 
 export function registerPage(success = false, error = null) {
@@ -31,12 +32,14 @@ export function registerPage(success = false, error = null) {
                 <input type="tel" id="phone" name="phone" autocomplete="tel" />
                 <label for="signalId">Signal ID (optional)</label>
                 <input type="text" id="signalId" name="signalId" />
+                <label for="knowFrom">How do you know Harry?</label>
+                <textarea id="knowFrom" name="knowFrom" required rows="3"></textarea>
                 <button type="submit">Register</button>
             </form>`;
 
   const scripts = success
     ? ""
-    : `${hashWasmScript()}${clientHashScript("/auth/register")}`;
+    : `${passwordToggleScript()}${hashWasmScript()}${clientHashScript("/auth/register")}`;
 
   return new Response(
     `<!doctype html>
@@ -54,10 +57,12 @@ export function registerPage(success = false, error = null) {
     ${nav()}
     <main role="main">
         <div class="main-container">
+          <article>
             <h1>Register</h1>
             ${messageHtml}
             ${formHtml}
             <p class="auth-link"><a href="/login">Already have an account? Login</a></p>
+          </article>
         </div>
     </main>
     ${themeToggleScript()}

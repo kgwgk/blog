@@ -27,6 +27,7 @@ export function membersPage(username) {
       nav() +
       '    <main role="main">' +
       '        <div class="main-container">' +
+      "          <article>" +
       '            <div class="members-page">' +
       "            <h1>Members</h1>" +
       "            <p>Welcome, " +
@@ -34,6 +35,7 @@ export function membersPage(username) {
       "!</p>" +
       '            <p class="logout-link"><a href="/auth/logout">Logout</a></p>' +
       "            </div>" +
+      "          </article>" +
       "        </div>" +
       "    </main>" +
       themeToggleScript() +

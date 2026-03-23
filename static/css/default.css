@@ -176,7 +176,7 @@ body {
   display: grid;
   grid-template-columns: [left] 16rem [logo-right] 1fr [right];
   grid-template-rows: [top] auto [content-top] auto [content-bottom] auto [bottom];
-  max-width: 80rem;
+  max-width: 90rem;
   margin: auto;
   padding-left: 1.5rem;
   padding-right: 1.5rem;

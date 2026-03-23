@@ -96,6 +96,7 @@ export default {
       const clientHash = form.get("clientHash");
       const phone = form.get("phone")?.trim() || null;
       const signalId = form.get("signalId")?.trim() || null;
+      const knowFrom = form.get("knowFrom")?.trim() || null;
 
       if (!username || !email || !clientHash) {
         return registerPage(false, "Username, email, and password are required.");
@@ -121,6 +122,7 @@ export default {
         email,
         phone,
         signalId,
+        knowFrom,
         hashedPassword,
         role: "friend",
         status: "pending",

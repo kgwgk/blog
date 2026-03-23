@@ -94,6 +94,7 @@ function pendingUserCard(user) {
       <p><strong>${escapeHtml(user.username)}</strong> — ${escapeHtml(user.email)}</p>
       ${user.phone ? `<p>Phone: ${escapeHtml(user.phone)}</p>` : ""}
       ${user.signalId ? `<p>Signal: ${escapeHtml(user.signalId)}</p>` : ""}
+      ${user.knowFrom ? `<p>How they know Harry: ${escapeHtml(user.knowFrom)}</p>` : ""}
       <form method="POST" action="/admin/api/approve">
         <input type="hidden" name="username" value="${escapeHtml(user.username)}" />
         <label>Role:
