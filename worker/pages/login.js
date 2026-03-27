@@ -1,4 +1,4 @@
-export function loginPage(error = null, redirect = "/") {
+export function loginPage(error = null, redirect = "/", siteKey = "") {
   let errorHtml = "";
   if (error === "pending") {
     errorHtml =
@@ -17,6 +17,7 @@ export function loginPage(error = null, redirect = "/") {
       themeInitScript() +
       headLinks() +
       authStyles() +
+      (siteKey ? turnstileScript() : "") +
       "</head>" +
       "<body>" +
       siteHeader() +
@@ -35,6 +36,7 @@ export function loginPage(error = null, redirect = "/") {
       '                <input type="text" id="username" name="username" required autocomplete="username" />' +
       '                <label for="password">Password</label>' +
       '                <input type="password" id="password" name="password" required autocomplete="current-password" />' +
+      (siteKey ? turnstileWidget(siteKey) : "") +
       '                <button type="submit">Login</button>' +
       "            </form>" +
       '            <p class="auth-link"><a href="/forgot-password">Forgot password?</a></p>' +
@@ -268,6 +270,14 @@ export function passwordToggleScript() {
     "})();" +
     "</script>"
   );
+}
+
+export function turnstileScript() {
+  return '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>';
+}
+
+export function turnstileWidget(siteKey) {
+  return '<div class="cf-turnstile" data-sitekey="' + siteKey + '"></div>';
 }
 
 export { escapeHtml };

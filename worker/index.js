@@ -16,6 +16,7 @@ import { membersPage } from "./pages/members.js";
 import { forgotPasswordPage } from "./pages/forgot-password.js";
 import { resetPasswordPage, resetPasswordExpiredPage, resetPasswordSuccessPage } from "./pages/reset-password.js";
 import { sendResetEmail } from "./email.js";
+import { verifyTurnstile } from "./turnstile.js";
 
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 const RESET_TOKEN_TTL = 30 * 60; // 30 minutes
@@ -59,23 +60,30 @@ export default {
       const redir = form.get("redirect") || "/";
 
       if (!username || !clientHash) {
-        return loginPage("Missing credentials", redir);
+        return loginPage("Missing credentials", redir, env.TURNSTILE_SITE_KEY_1);
+      }
+
+      const cfToken = form.get("cf-turnstile-response");
+      const ip = request.headers.get("CF-Connecting-IP");
+      const turnstileOk = await verifyTurnstile(cfToken, env.TURNSTILE_SECRET_KEY_1, ip);
+      if (!turnstileOk) {
+        return loginPage("invalid", redir, env.TURNSTILE_SITE_KEY_1);
       }
 
       const user = await getUser(env, username);
       if (!user) {
-        return loginPage("invalid", redir);
+        return loginPage("invalid", redir, env.TURNSTILE_SITE_KEY_1);
       }
       if (user.status === "pending") {
-        return loginPage("pending", redir);
+        return loginPage("pending", redir, env.TURNSTILE_SITE_KEY_1);
       }
       if (user.status !== "approved") {
-        return loginPage("invalid", redir);
+        return loginPage("invalid", redir, env.TURNSTILE_SITE_KEY_1);
       }
 
       const valid = await verifyPepperedHash(clientHash, user.hashedPassword, env.HASH_PEPPER);
       if (!valid) {
-        return loginPage("invalid", redir);
+        return loginPage("invalid", redir, env.TURNSTILE_SITE_KEY_1);
       }
 
       const exp = Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE;
@@ -99,19 +107,27 @@ export default {
       const knowFrom = form.get("knowFrom")?.trim() || null;
 
       if (!username || !email || !clientHash) {
-        return registerPage(false, "Username, email, and password are required.");
+        return registerPage(false, "Username, email, and password are required.", env.TURNSTILE_SITE_KEY_1);
+      }
+
+      const cfToken = form.get("cf-turnstile-response");
+      const ip = request.headers.get("CF-Connecting-IP");
+      const turnstileOk = await verifyTurnstile(cfToken, env.TURNSTILE_SECRET_KEY_1, ip);
+      if (!turnstileOk) {
+        return registerPage(false, "Verification failed. Please try again.", env.TURNSTILE_SITE_KEY_1);
       }
 
       if (username.length < 3 || !/^[a-z0-9_-]+$/.test(username)) {
         return registerPage(
           false,
-          "Username must be at least 3 characters (lowercase letters, numbers, hyphens, underscores)."
+          "Username must be at least 3 characters (lowercase letters, numbers, hyphens, underscores).",
+          env.TURNSTILE_SITE_KEY_1,
         );
       }
 
       const existing = await env.HCENTNER_BLOG_AUTH_USERS.get(`user:${username}`);
       if (existing) {
-        return registerPage(false, "Username already taken.");
+        return registerPage(false, "Username already taken.", env.TURNSTILE_SITE_KEY_1);
       }
 
       const hashedPassword = await pepperHash(clientHash, env.HASH_PEPPER);
@@ -141,7 +157,14 @@ export default {
       const username = form.get("username")?.trim().toLowerCase();
 
       if (!username) {
-        return forgotPasswordPage(false, "Username is required.");
+        return forgotPasswordPage(false, "Username is required.", env.TURNSTILE_SITE_KEY_1);
+      }
+
+      const cfToken = form.get("cf-turnstile-response");
+      const ip = request.headers.get("CF-Connecting-IP");
+      const turnstileOk = await verifyTurnstile(cfToken, env.TURNSTILE_SECRET_KEY_1, ip);
+      if (!turnstileOk) {
+        return forgotPasswordPage(false, "Verification failed. Please try again.", env.TURNSTILE_SITE_KEY_1);
       }
 
       // Always show success to prevent user enumeration
@@ -220,15 +243,15 @@ export default {
     if (method === "GET" && pathname === "/login") {
       const error = url.searchParams.get("error");
       const redir = url.searchParams.get("redirect") || "/";
-      return loginPage(error, redir);
+      return loginPage(error, redir, env.TURNSTILE_SITE_KEY_1);
     }
 
     if (method === "GET" && pathname === "/register") {
-      return registerPage();
+      return registerPage(false, null, env.TURNSTILE_SITE_KEY_1);
     }
 
     if (method === "GET" && pathname === "/forgot-password") {
-      return forgotPasswordPage();
+      return forgotPasswordPage(false, null, env.TURNSTILE_SITE_KEY_1);
     }
 
     if (method === "GET" && pathname === "/reset-password") {

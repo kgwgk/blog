@@ -5,9 +5,11 @@ import {
   siteHeader,
   nav,
   themeToggleScript,
+  turnstileScript,
+  turnstileWidget,
 } from "./login.js";
 
-export function forgotPasswordPage(success = false, error = null) {
+export function forgotPasswordPage(success = false, error = null, siteKey = "") {
   let messageHtml = "";
   if (success) {
     messageHtml =
@@ -21,6 +23,7 @@ export function forgotPasswordPage(success = false, error = null) {
     : '<form class="auth-form" method="POST" action="/auth/forgot-password">' +
       '    <label for="username">Username</label>' +
       '    <input type="text" id="username" name="username" required autocomplete="username" />' +
+      (siteKey ? turnstileWidget(siteKey) : "") +
       '    <button type="submit">Send Reset Email</button>' +
       "</form>";
 
@@ -34,6 +37,7 @@ export function forgotPasswordPage(success = false, error = null) {
       themeInitScript() +
       headLinks() +
       authStyles() +
+      (!success && siteKey ? turnstileScript() : "") +
       "</head>" +
       "<body>" +
       siteHeader() +

@@ -73,6 +73,7 @@ A Cloudflare Worker (`worker/index.js`) sits in front of static assets to protec
 - **Storage**: Cloudflare KV (`HCENTNER_BLOG_AUTH_USERS` binding), key format `user:<username>`.
 - **Roles**: `friend` (1) < `family` (2) < `admin` (3). `/members/*` requires `friend`, `/admin/*` requires `admin`.
 - **Password reset**: User enters username → Worker generates random token stored in `RESET_TOKENS` KV (30-min TTL) → sends email via Resend → user clicks link → client-side Argon2id rehash → Worker updates password. Rate-limited to 1 request per username per 5 minutes. No user enumeration (always shows success).
+- **Turnstile**: Cloudflare Turnstile (invisible CAPTCHA) on login, register, and forgot-password forms. Client-side widget auto-injects a `cf-turnstile-response` token; Worker verifies it server-side via Cloudflare's siteverify API before processing the request.
 
 ### Worker Files
 
@@ -87,14 +88,16 @@ A Cloudflare Worker (`worker/index.js`) sits in front of static assets to protec
 - `worker/pages/reset-password.js` - Reset password form (set new password via token link)
 - `worker/pages/admin.js` - Admin dashboard (list/approve/disable/role-set/password-reset users)
 - `worker/email.js` - Resend email helper for sending password reset emails
+- `worker/turnstile.js` - Cloudflare Turnstile server-side verification
 - `worker/scripts/seed-admin.js` - CLI script to create first admin user in KV
 
 ### Secrets
 
-Three Cloudflare secrets (set via `wrangler secret put`):
+Four Cloudflare secrets (set via `wrangler secret put`):
 - **`COOKIE_SECRET`** - Signs session cookies
 - **`HASH_PEPPER`** - HMAC pepper for password hashes
 - **`RESEND_API_KEY`** - Resend API key for sending password reset emails
+- **`TURNSTILE_SECRET_KEY_1`** - Cloudflare Turnstile secret key for server-side verification
 
 For local dev, these are in `.dev.vars` (gitignored).
 
@@ -108,6 +111,7 @@ wrangler kv namespace create RESET_TOKENS --preview
 wrangler secret put COOKIE_SECRET
 wrangler secret put HASH_PEPPER
 wrangler secret put RESEND_API_KEY
+wrangler secret put TURNSTILE_SECRET_KEY_1
 cd worker && node scripts/seed-admin.js <password> <email>
 ```
 

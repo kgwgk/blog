@@ -65,6 +65,13 @@ describe("POST /auth/forgot-password", () => {
     }
   });
 
+  it("rejects request without Turnstile token", async () => {
+    const resp = await postForm("/auth/forgot-password", { username: "alice" });
+    expect(resp.status).toBe(200);
+    const html = await resp.text();
+    expect(html).toContain("Verification failed");
+  });
+
   it("returns error for empty username", async () => {
     const resp = await postForm("/auth/forgot-password", { username: "" });
     expect(resp.status).toBe(200);
@@ -76,6 +83,7 @@ describe("POST /auth/forgot-password", () => {
     await seedUser("alice", "alice@example.com");
     const resp = await postForm("/auth/forgot-password", {
       username: "alice",
+      "cf-turnstile-response": "test-token",
     });
     expect(resp.status).toBe(200);
     const html = await resp.text();
@@ -97,6 +105,7 @@ describe("POST /auth/forgot-password", () => {
   it("shows same success for non-existent user (no enumeration)", async () => {
     const resp = await postForm("/auth/forgot-password", {
       username: "nobody",
+      "cf-turnstile-response": "test-token",
     });
     expect(resp.status).toBe(200);
     const html = await resp.text();
@@ -127,6 +136,7 @@ describe("POST /auth/forgot-password", () => {
 
     const resp = await postForm("/auth/forgot-password", {
       username: "noemail",
+      "cf-turnstile-response": "test-token",
     });
     expect(resp.status).toBe(200);
     const html = await resp.text();
@@ -140,12 +150,12 @@ describe("POST /auth/forgot-password", () => {
     await seedUser("bob", "bob@example.com");
 
     // First request creates token
-    await postForm("/auth/forgot-password", { username: "bob" });
+    await postForm("/auth/forgot-password", { username: "bob", "cf-turnstile-response": "test-token" });
     const firstToken = await getResetToken();
     expect(firstToken).not.toBeNull();
 
     // Second request is rate limited — no new token
-    await postForm("/auth/forgot-password", { username: "bob" });
+    await postForm("/auth/forgot-password", { username: "bob", "cf-turnstile-response": "test-token" });
     const list = await env.RESET_TOKENS.list({ prefix: "reset:" });
     expect(list.keys.length).toBe(1); // Still just one token
   });
@@ -154,6 +164,7 @@ describe("POST /auth/forgot-password", () => {
     await seedUser("pending-user", "pending@example.com", "pending");
     const resp = await postForm("/auth/forgot-password", {
       username: "pending-user",
+      "cf-turnstile-response": "test-token",
     });
     const html = await resp.text();
     expect(html).toContain("If an account with that username exists");
@@ -166,6 +177,7 @@ describe("POST /auth/forgot-password", () => {
     await seedUser("disabled-user", "disabled@example.com", "disabled");
     const resp = await postForm("/auth/forgot-password", {
       username: "disabled-user",
+      "cf-turnstile-response": "test-token",
     });
     const html = await resp.text();
     expect(html).toContain("If an account with that username exists");
@@ -176,7 +188,7 @@ describe("POST /auth/forgot-password", () => {
 
   it("normalizes username to lowercase", async () => {
     await seedUser("mixedcase", "mixed@example.com");
-    await postForm("/auth/forgot-password", { username: "  MixedCase  " });
+    await postForm("/auth/forgot-password", { username: "  MixedCase  ", "cf-turnstile-response": "test-token" });
     const token = await getResetToken();
     expect(token).not.toBeNull();
 

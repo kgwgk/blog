@@ -8,9 +8,11 @@ import {
   hashWasmScript,
   clientHashScript,
   passwordToggleScript,
+  turnstileScript,
+  turnstileWidget,
 } from "./login.js";
 
-export function registerPage(success = false, error = null) {
+export function registerPage(success = false, error = null, siteKey = "") {
   let messageHtml = "";
   if (success) {
     messageHtml = `<p class="auth-success">Registration submitted! Your account is pending admin approval.</p>`;
@@ -34,6 +36,7 @@ export function registerPage(success = false, error = null) {
                 <input type="text" id="signalId" name="signalId" />
                 <label for="knowFrom">How do you know Harry?</label>
                 <textarea id="knowFrom" name="knowFrom" required rows="3"></textarea>
+                ${siteKey ? turnstileWidget(siteKey) : ""}
                 <button type="submit">Register</button>
             </form>`;
 
@@ -51,6 +54,7 @@ export function registerPage(success = false, error = null) {
     ${themeInitScript()}
     ${headLinks()}
     ${authStyles()}
+    ${!success && siteKey ? turnstileScript() : ""}
 </head>
 <body>
     ${siteHeader()}
