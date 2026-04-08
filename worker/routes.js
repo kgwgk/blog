@@ -1,6 +1,5 @@
 const PROTECTED_PATHS = [
   { pattern: "/members/*", minRole: "friend" },
-  { pattern: "/admin/*", minRole: "admin" },
 ];
 
 const ROLE_HIERARCHY = {

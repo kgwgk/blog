@@ -13,6 +13,7 @@ static/_site
 result
 result-*
 
+
 # vim
 *~
 *.swp
@@ -36,3 +37,10 @@ worker/bun.lock
 # wasm build artifacts
 static/wasm/
 frontend/dist/
+# ExoMonad - track config and source, ignore runtime artifacts
+.exo/*
+!.exo/config.toml
+!.exo/roles/
+!.exo/lib/
+!.exo/rules/
+**/*/CLAUDE.md

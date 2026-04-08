@@ -3,7 +3,7 @@ title: Cyber Sigilism - Church of Our Lady before Tyn
 tags: art
 ---
 
-A cyber sigilism interpretation of the Church of Our Lady before Tyn in Prague, traced from the twin Gothic spires into sharp, flowing tribal curves.
+A cyber sigilism interpretation of the Church of Our Lady before Tyn in Prague.
 
 <!--more-->
 

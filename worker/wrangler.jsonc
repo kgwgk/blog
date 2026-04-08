@@ -3,24 +3,13 @@
 	"compatibility_date": "2025-12-17",
 	"main": "./index.js",
 	"vars": {
-		"TURNSTILE_SITE_KEY_1": "YOUR_SITE_KEY_HERE"
+		"SUPABASE_URL": "YOUR_SUPABASE_URL",
+		"SUPABASE_ANON_KEY": "YOUR_SUPABASE_ANON_KEY"
 	},
 	"assets": {
 		"directory": "../static/_site",
 		"binding": "ASSETS"
 	},
-	"kv_namespaces": [
-		{
-			"binding": "HCENTNER_BLOG_AUTH_USERS",
-			"id": "bd72e447bce1411597a3f1ae0cdb98bb",
-			"preview_id": "7c867ae4bfd448e6b8ea43555f1d976a"
-		},
-		{
-			"binding": "RESET_TOKENS",
-			"id": "2d3121f7032643fab10bcb2c1ad0ebac",
-			"preview_id": "c184f876c8b4433a947faca672a8c95f"
-		}
-	],
 	"observability": {
 		"enabled": false,
 		"head_sampling_rate": 1,

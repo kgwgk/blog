@@ -5,6 +5,11 @@ export default defineConfig({
   plugins: [
     cloudflareTest({
       wrangler: { configPath: "./wrangler.jsonc" },
+      miniflare: {
+        bindings: {
+          SUPABASE_JWT_SECRET: "test-jwt-secret-for-verification",
+        },
+      },
     }),
   ],
   test: {

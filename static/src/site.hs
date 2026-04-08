@@ -141,6 +141,15 @@ main = do
           >>= loadAndApplyTemplate "templates/default.html" myIndexCtx
           >>= relativizeUrls
 
+    create ["rss.xml"] $ do
+      route idRoute
+      compile $ do
+        let feedCtx = myPostCtx <> bodyField "description"
+        posts <-
+          fmap (take 10) . recentFirst
+            =<< loadAllSnapshots "posts/*" "content"
+        renderRss myFeedConfiguration feedCtx posts
+
     match "about/*" $ compile templateBodyCompiler
     match "templates/*" $ compile templateBodyCompiler
 
@@ -173,6 +182,16 @@ texifyTypst (Pandoc meta blocks) = do
 
 root :: String
 root = "https://hcentner.dev"
+
+myFeedConfiguration :: FeedConfiguration
+myFeedConfiguration =
+  FeedConfiguration
+    { feedTitle = "hcentner's blog"
+    , feedDescription = "Harrison Centner's personal blog"
+    , feedAuthorName = "Harrison Centner"
+    , feedAuthorEmail = ""
+    , feedRoot = root
+    }
 
 customPandocCompiler :: Compiler (Item String)
 customPandocCompiler =

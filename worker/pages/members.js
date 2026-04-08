@@ -4,9 +4,10 @@ import {
   siteHeader,
   nav,
   themeToggleScript,
-} from "./login.js";
+  escapeHtml,
+} from "./shared.js";
 
-export function membersPage(username) {
+export function membersPage(email) {
   return new Response(
     "<!doctype html>" +
       '<html lang="en">' +
@@ -31,7 +32,7 @@ export function membersPage(username) {
       '            <div class="members-page">' +
       "            <h1>Members</h1>" +
       "            <p>Welcome, " +
-      escapeHtml(username) +
+      escapeHtml(email) +
       "!</p>" +
       '            <p class="logout-link"><a href="/auth/logout">Logout</a></p>' +
       "            </div>" +
@@ -45,10 +46,3 @@ export function membersPage(username) {
   );
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}

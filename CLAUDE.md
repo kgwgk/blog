@@ -63,56 +63,44 @@ Manual formatting: `./fmt.sh`
 
 ## Cloudflare Worker Auth
 
-A Cloudflare Worker (`worker/index.js`) sits in front of static assets to protect paths like `/members/*` and `/admin/*`.
+A Cloudflare Worker (`worker/index.js`) sits in front of static assets to protect paths like `/members/*`.
 
 ### Architecture
 
-- **Client-side hashing**: Browser computes Argon2id hash via `hash-wasm` (loaded from CDN). Salt is derived deterministically: `SHA-256("hcentner.dev:" + username)[:16]`.
-- **Server-side pepper**: Worker applies `HMAC-SHA256(clientHash, HASH_PEPPER)` before storing/comparing. No WASM needed in the Worker — all server crypto uses Web Crypto API.
-- **Sessions**: Stateless signed cookies (`HMAC-SHA256`, 7-day expiry). Payload: `{ sub, role, exp }`.
-- **Storage**: Cloudflare KV (`HCENTNER_BLOG_AUTH_USERS` binding), key format `user:<username>`.
-- **Roles**: `friend` (1) < `family` (2) < `admin` (3). `/members/*` requires `friend`, `/admin/*` requires `admin`.
-- **Password reset**: User enters username → Worker generates random token stored in `RESET_TOKENS` KV (30-min TTL) → sends email via Resend → user clicks link → client-side Argon2id rehash → Worker updates password. Rate-limited to 1 request per username per 5 minutes. No user enumeration (always shows success).
-- **Turnstile**: Cloudflare Turnstile (invisible CAPTCHA) on login, register, and forgot-password forms. Client-side widget auto-injects a `cf-turnstile-response` token; Worker verifies it server-side via Cloudflare's siteverify API before processing the request.
+- **Authentication**: Supabase Auth handles user registration, login, password reset, and email sending. Browser pages use `@supabase/supabase-js` from CDN.
+- **Sessions**: After browser authenticates with Supabase, tokens are POSTed to `/auth/callback`. The Worker verifies the JWT (HMAC-SHA256) and sets HttpOnly cookies (`sb_access_token`, `sb_refresh_token`).
+- **Token refresh**: When access token expires, the Worker refreshes server-side via Supabase REST API.
+- **Roles**: Stored in Supabase `app_metadata.role`. Hierarchy: `friend` (1) < `family` (2) < `admin` (3). `/members/*` requires `friend`. Users without a role are treated as "pending".
+- **User management**: Done via Supabase dashboard (approve users, set roles).
 
 ### Worker Files
 
-- `worker/index.js` - Main fetch handler (routing, auth checks, asset passthrough)
-- `worker/auth.js` - HMAC cookie signing, password pepper functions (Web Crypto)
+- `worker/index.js` - Main fetch handler (routing, auth callback, token refresh, asset passthrough)
+- `worker/jwt.js` - Supabase JWT verification, session extraction, token refresh, cookie helpers
 - `worker/routes.js` - Protected path config, role hierarchy, path matching
-- `worker/migrate.js` - Schema migration logic (lazy upgrades on KV read)
-- `worker/pages/login.js` - Login page HTML + shared HTML fragments (header, nav, theme toggle)
-- `worker/pages/register.js` - Registration form HTML
+- `worker/pages/shared.js` - Shared HTML fragments (header, nav, theme toggle, styles, Supabase client script)
+- `worker/pages/login.js` - Login page (email + password via Supabase JS client)
+- `worker/pages/register.js` - Registration form (signUp via Supabase, pending approval)
 - `worker/pages/members.js` - Members landing page
-- `worker/pages/forgot-password.js` - Forgot password form (enter username to receive reset email)
-- `worker/pages/reset-password.js` - Reset password form (set new password via token link)
-- `worker/pages/admin.js` - Admin dashboard (list/approve/disable/role-set/password-reset users)
-- `worker/email.js` - Resend email helper for sending password reset emails
-- `worker/turnstile.js` - Cloudflare Turnstile server-side verification
-- `worker/scripts/seed-admin.js` - CLI script to create first admin user in KV
+- `worker/pages/forgot-password.js` - Forgot password (resetPasswordForEmail via Supabase)
+- `worker/pages/reset-password.js` - Reset password (reads tokens from URL hash, updateUser via Supabase)
 
 ### Secrets
 
-Four Cloudflare secrets (set via `wrangler secret put`):
-- **`COOKIE_SECRET`** - Signs session cookies
-- **`HASH_PEPPER`** - HMAC pepper for password hashes
-- **`RESEND_API_KEY`** - Resend API key for sending password reset emails
-- **`TURNSTILE_SECRET_KEY_1`** - Cloudflare Turnstile secret key for server-side verification
+One Cloudflare secret (set via `wrangler secret put`):
+- **`SUPABASE_JWT_SECRET`** - JWT signing secret from Supabase dashboard
 
-For local dev, these are in `.dev.vars` (gitignored).
+Public vars (in `wrangler.jsonc`):
+- **`SUPABASE_URL`** - Supabase project URL
+- **`SUPABASE_ANON_KEY`** - Supabase anonymous/public key
+
+For local dev, secrets are in `.dev.vars` (gitignored).
 
 ### Setup
 
 ```sh
-wrangler kv namespace create HCENTNER_BLOG_AUTH_USERS
-wrangler kv namespace create HCENTNER_BLOG_AUTH_USERS --preview
-wrangler kv namespace create RESET_TOKENS
-wrangler kv namespace create RESET_TOKENS --preview
-wrangler secret put COOKIE_SECRET
-wrangler secret put HASH_PEPPER
-wrangler secret put RESEND_API_KEY
-wrangler secret put TURNSTILE_SECRET_KEY_1
-cd worker && node scripts/seed-admin.js <password> <email>
+wrangler secret put SUPABASE_JWT_SECRET
+# Set SUPABASE_URL and SUPABASE_ANON_KEY in wrangler.jsonc
 ```
 
 ## Version Control
