@@ -7,7 +7,7 @@
 		"SUPABASE_ANON_KEY": "YOUR_SUPABASE_ANON_KEY"
 	},
 	"assets": {
-		"directory": "../static/_site",
+		"directory": "../result",
 		"binding": "ASSETS"
 	},
 	"observability": {

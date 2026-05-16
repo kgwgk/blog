@@ -43,11 +43,15 @@ main = do
       route idRoute
       compile copyFileCompiler
 
-    tags <- buildTags "posts/**" (fromCapture "tags/*.html")
+    let getVisibleTags ident = do
+          h <- isHidden ident
+          if h then pure [] else getTags ident
+    tags <- buildTagsWith getVisibleTags "posts/**" (fromCapture "tags/*.html")
     let myPostCtx =
           mconcat
             [ dateField "date" "%B %e, %Y"
             , tagsField "tags" tags
+            , hiddenNoindexField
             , myDefaultContext
             ]
     tagsRules tags $ \tag pat -> do
@@ -79,7 +83,7 @@ main = do
     create ["archive.html"] $ do
       route idRoute
       compile $ do
-        posts <- recentFirst =<< loadAll "posts/**"
+        posts <- recentFirst =<< excludeHidden =<< loadAll "posts/**"
         tagList <- renderTagList tags
         let myArchiveCtx =
               mconcat
@@ -111,7 +115,7 @@ main = do
     create ["sitemap.xml"] $ do
       route idRoute
       compile $ do
-        posts <- recentFirst =<< loadAll "posts/*"
+        posts <- recentFirst =<< excludeHidden =<< loadAll "posts/*"
         pages <- loadAll "pages/*"
         let allPages = return (pages ++ posts)
         let sitemapCtx =
@@ -125,7 +129,7 @@ main = do
     match "index.html" $ do
       route idRoute
       compile $ do
-        posts <- fmap (take 5) . recentFirst =<< loadAllSnapshots "posts/*" "content"
+        posts <- fmap (take 5) . recentFirst =<< excludeHidden =<< loadAllSnapshots "posts/*" "content"
         let myTeaserPostCtx =
               teaserField "teaser" "content" <> myPostCtx
             myIndexCtx =
@@ -147,6 +151,7 @@ main = do
         let feedCtx = myPostCtx <> bodyField "description"
         posts <-
           fmap (take 10) . recentFirst
+            =<< excludeHidden
             =<< loadAllSnapshots "posts/*" "content"
         renderRss myFeedConfiguration feedCtx posts
 
@@ -158,6 +163,21 @@ main = do
 --------------------------------------------------------------------------------
 -- Utility Functions
 --------------------------------------------------------------------------------
+
+isHidden :: (MonadMetadata m) => Identifier -> m Bool
+isHidden ident = do
+  mb <- getMetadataField ident "hidden"
+  pure $ case mb of
+    Just v | v /= "" && v /= "false" -> True
+    _ -> False
+
+excludeHidden :: [Item a] -> Compiler [Item a]
+excludeHidden = filterM (fmap not . isHidden . itemIdentifier)
+
+hiddenNoindexField :: Context a
+hiddenNoindexField = field "noindex" $ \item -> do
+  h <- isHidden (itemIdentifier item)
+  if h then pure "true" else noResult "post is not hidden"
 
 texifyInline :: Inline -> PandocIO Inline
 texifyInline = \case

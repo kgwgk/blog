@@ -411,6 +411,14 @@ h1 {
   margin-bottom: 0.1rem;
 }
 
+.hidden-tag {
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: normal;
+  color: var(--light-grey-color);
+  margin-left: 0.5rem;
+}
+
 h2 {
   font-size: 2.6rem;
   font-weight: 500;
