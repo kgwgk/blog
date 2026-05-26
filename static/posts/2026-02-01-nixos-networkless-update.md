@@ -58,10 +58,14 @@ connection. Otherwise you only need another computer with `Nix` and internet.
        ```bash
        unxz --verbose nixos-system.nar
        ```
-4. Update nix vars and reboot
+4. Import the closure and activate it
 
     ```bash
-    TODO get commands from zylphia
+    sudo nix-store --import < nixos-system.nar
+    sudo nix-env --profile /nix/var/nix/profiles/system \
+      --set /nix/store/<hash>-nixos-system-<host>-<version>
+    sudo /nix/var/nix/profiles/system/bin/switch-to-configuration boot
+    sudo reboot
     ```
 
 My nixconfig is [here](https://github.com/HarrisonCentner/nixconfig). 

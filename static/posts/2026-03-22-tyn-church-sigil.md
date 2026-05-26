@@ -1,6 +1,7 @@
 ---
 title: Cyber Sigilism - Church of Our Lady before Tyn
 tags: art
+hidden: true
 ---
 
 A cyber sigilism interpretation of the Church of Our Lady before Tyn in Prague.
