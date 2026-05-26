@@ -23,7 +23,7 @@ A style convention for `flake-parts` that I enjoy is the [dendritic nix pattern]
 make every file a `flake-parts` module.
 [NaN](https://not-a-number.io/2025/refactoring-my-infrastructure-as-code-configurations/#trade-offs) nicely 
 described this "inversion of configuration control" as a switch from
-"Host-Centric" to "Featue-Centric" configuration. Using [import-tree](https://github.com/vic/import-tree)
+"Host-Centric" to "Feature-Centric" configuration. Using [import-tree](https://github.com/vic/import-tree)
 removes the boilerplate that I would otherwise incur from `flake-parts`,
 since one tends to create many more `.nix` files.
 
