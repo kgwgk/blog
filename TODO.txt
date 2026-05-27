@@ -1,0 +1,4 @@
+- Add supabase html templates
+- Test that the password reset flow works with supabase
+- Make sure the invite user email routes them to hcentner.dev/login
+- make sure that supabase allowlists hcentner.dev/reset-password

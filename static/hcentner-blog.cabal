@@ -31,10 +31,12 @@ common shared
     , aeson
     , async
     , base
+    , clay
     , data-default
     , directory
     , filepath
     , hakyll
+    , lucid
     , mtl
     , optics-core
     , pandoc
@@ -43,10 +45,36 @@ common shared
     , text
     , time
 
-  hs-source-dirs:     src
   default-language:   GHC2021
+
+library
+  import:          shared
+  hs-source-dirs:  src
+  exposed-modules:
+    Design.Css
+    Design.Email
+    Design.Tokens
 
 executable site
   import:         shared
-  hs-source-dirs: src
+  hs-source-dirs: app
   main-is:        site.hs
+  build-depends:  hcentner-blog
+
+executable emails
+  import:         shared
+  hs-source-dirs: app
+  main-is:        emails.hs
+  build-depends:
+    , bytestring
+    , hcentner-blog
+
+test-suite email-tests
+  import:         shared
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        EmailSpec.hs
+  build-depends:
+    , hcentner-blog
+    , tasty
+    , tasty-hunit

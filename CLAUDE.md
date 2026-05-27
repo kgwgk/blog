@@ -5,11 +5,13 @@ Personal blog at [hcentner.dev](https://hcentner.dev), built with Hakyll (Haskel
 ## Project Structure
 
 - `static/` - Hakyll site generator and content
-  - `static/src/site.hs` - Main Hakyll site generator (single source file)
-  - `static/hcentner-blog.cabal` - Cabal project file
+  - `static/app/site.hs` - Main Hakyll site generator executable
+  - `static/app/emails.hs` - Emits Supabase email templates as a Management API JSON payload
+  - `static/src/Design/` - Design library: `Tokens.hs` (single source of truth for colors/fonts/sizing), `Css.hs` (clay stylesheet), `Email.hs` (lucid email templates)
+  - `static/test/EmailSpec.hs` - Email template test suite
+  - `static/hcentner-blog.cabal` - Cabal project file (library + `site`/`emails` executables + `email-tests`)
   - `static/posts/` - Blog posts in Markdown (named `YYYY-MM-DD-slug.md`)
   - `static/templates/` - Hakyll HTML templates (`default.html` is the base layout)
-  - `static/css/default.css` - Site stylesheet
   - `static/images/` - Static images
   - `static/_site/` - Generated output (do not edit)
 - `worker/` - Cloudflare Worker for authentication (see below)
@@ -40,6 +42,8 @@ nix shell nixpkgs#prefetch-npm-deps -c prefetch-npm-deps worker/package-lock.jso
 cd static && cabal build        # Build the site generator
 cd static && cabal run site -- build   # Generate the site
 cd static && cabal run site -- watch   # Serve with live reload
+cd static && cabal run emails          # Print Supabase email-template JSON payload
+cd static && cabal test                # Run email template tests
 cd worker && npx wrangler dev          # Run wrangler dev server (worker + static assets)
 ```
 
@@ -60,6 +64,16 @@ Manual formatting: `./fmt.sh`
 - **Fourmolu style**: 2-space indentation, leading comma style, record brace space
 - **GHC warnings**: `-Wall -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-deriving-strategies`
 - **Math rendering**: Inline Typst math in posts is converted to TeX for MathJax
+
+## Design System (single source of truth)
+
+All design values (colors, fonts, sizing) live in `static/src/Design/Tokens.hs`. Everything downstream is generated — there is no hand-written CSS:
+
+- `Design.Css` (clay) renders the full stylesheet; the `site` executable emits it as `css/default.css` during site generation. The worker auth shells and miso WASM apps style themselves via classes from this same stylesheet, so they need no design code of their own.
+- `Design.Email` (lucid) renders the five Supabase auth email templates (confirm signup, invite, magic link, change email, reset password) with inline styles (email clients ignore external CSS and CSS variables; light palette only). Supabase Go-template placeholders like `{{ .ConfirmationURL }}` are emitted literally.
+- The `emails` executable prints the templates as a JSON payload using Supabase Management API field names (`mailer_subjects_*`, `mailer_templates_*_content`); CI PATCHes it to `api.supabase.com/v1/projects/{ref}/config/auth` (see Build and CI).
+
+To change the design: edit `Design.Tokens` (or `Design.Css` for structural rules), rebuild, and run `site rebuild` — Hakyll cannot track Haskell-code changes as content dependencies, so a plain `site build` won't regenerate the CSS. After changing library deps in the cabal file, re-enter `nix develop` to refresh the GHC package set.
 
 ## Cloudflare Worker Auth
 
@@ -111,4 +125,5 @@ This project uses **jj** (Jujutsu) for version control. Do not use raw git comma
 
 - The `PROD` env var controls production-specific behavior (e.g., analytics)
 - Site deploys to hcentner.dev (Cloudflare, via wrangler)
-- Worker tests run in CI via GitHub Actions on a NixOS self-hosted runner (`nixos-zylphia`) in the `nixos-restricted` runner group. There are no ubuntu-latest or macos runners available.
+- Worker tests run in CI via GitHub Actions on a NixOS self-hosted runner (`nixos-zylphia`) in the `nixos-restricted` runner group. `ubuntu-latest` is also available (used by `build-site.yml`, `check-links.yml`, and `sync-email-templates.yml`); there are no macos runners.
+- `sync-email-templates.yml` pushes generated Supabase email templates to the Management API on master pushes touching `static/src/Design/**` (also manual dispatch). Requires GitHub secrets `SUPABASE_ACCESS_TOKEN` (Supabase personal access token) and `SUPABASE_PROJECT_REF`.

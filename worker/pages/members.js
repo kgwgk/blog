@@ -1,10 +1,8 @@
 import {
   themeInitScript,
   headLinks,
-  siteHeader,
-  nav,
-  themeToggleScript,
-  escapeHtml,
+  authMetaTags,
+  wasmAuthScripts,
 } from "./shared.js";
 
 export function membersPage(email) {
@@ -15,34 +13,16 @@ export function membersPage(email) {
       '    <meta charset="utf-8">' +
       '    <meta name="viewport" content="width=device-width, initial-scale=1">' +
       "    <title>Members - hcentner's blog</title>" +
+      // Members doesn't use Supabase — only injects the email for miso to render.
+      authMetaTags("", "", { "member-email": email }) +
       themeInitScript() +
       headLinks() +
-      "<style>" +
-      ".members-page { max-width: 40rem; margin: 2rem auto; }" +
-      ".members-page p { font-size: 1.5rem; font-family: 'Lora', serif; margin-bottom: 0.75rem; color: var(--dark-grey-color); }" +
-      ".logout-link { font-size: 1.4rem; }" +
-      "</style>" +
       "</head>" +
       "<body>" +
-      siteHeader() +
-      nav() +
-      '    <main role="main">' +
-      '        <div class="main-container">' +
-      "          <article>" +
-      '            <div class="members-page">' +
-      "            <h1>Members</h1>" +
-      "            <p>Welcome, " +
-      escapeHtml(email) +
-      "!</p>" +
-      '            <p class="logout-link"><a href="/auth/logout">Logout</a></p>' +
-      "            </div>" +
-      "          </article>" +
-      "        </div>" +
-      "    </main>" +
-      themeToggleScript() +
+      '    <div id="auth-app" data-miso-component="auth"></div>' +
+      wasmAuthScripts() +
       "</body>" +
       "</html>",
     { status: 200, headers: { "Content-Type": "text/html;charset=UTF-8" } },
   );
 }
-

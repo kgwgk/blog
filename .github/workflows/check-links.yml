@@ -1,0 +1,66 @@
+name: check-links
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+  schedule:
+    # Nightly at 06:00 UTC. External link checks are flaky (live HEAD
+    # requests, no caching), so they run on a schedule rather than per-push.
+    - cron: "0 6 * * *"
+
+jobs:
+  # Internal links only: deterministic, runs in the network-less nix sandbox.
+  # Runs on every push to master (and manual dispatch); blocks on broken links.
+  internal:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v30
+
+      - uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-site-${{ hashFiles('**/*.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-site-
+          gc-max-store-size-linux: 8G
+          purge: true
+          purge-prefixes: nix-${{ runner.os }}-site-
+          purge-created: 0
+          purge-primary-key: never
+          purge-last-accessed: 604800
+
+      - run: nix build --print-build-logs .#checks.x86_64-linux.site-links
+
+  # Full check (internal + external): needs network, so it runs the `site`
+  # binary as a plain step rather than inside a nix derivation. Nightly + manual.
+  external:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v30
+
+      - uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-site-${{ hashFiles('**/*.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-site-
+          gc-max-store-size-linux: 8G
+          purge: true
+          purge-prefixes: nix-${{ runner.os }}-site-
+          purge-created: 0
+          purge-primary-key: never
+          purge-last-accessed: 604800
+
+      - name: Build site generator (with external link checking) and site
+        run: |
+          nix build --print-build-logs .#hcentner-blog -o gen
+          nix build --print-build-logs .#site -o site-out
+
+      - name: Check links
+        run: |
+          cp -rL site-out _site
+          chmod -R u+w _site
+          LANG=C.UTF-8 ./gen/bin/site check

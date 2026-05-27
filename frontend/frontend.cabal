@@ -10,6 +10,22 @@ common wasm
 
     cpp-options: -DWASM
 
+-- FFI-free pure logic shared by the auth executable and the native test-suite.
+-- Depends only on base + text so it builds on both wasm32 and native GHC.
+library auth-pure
+  hs-source-dirs:   pure
+  exposed-modules:
+    Auth.Pure.Hash
+    Auth.Pure.Messages
+    Auth.Pure.Routing
+
+  build-depends:
+    , base  <5
+    , text
+
+  default-language: GHC2021
+  ghc-options:      -Wall
+
 executable counter
   import:           wasm
   main-is:          Main.hs
@@ -22,3 +38,60 @@ executable counter
 
   default-language: GHC2021
   ghc-options:      -O2 -Wall
+
+executable auth
+  import:           wasm
+  main-is:          Main.hs
+  other-modules:
+    Components.Layout
+    Components.PasswordInput
+    Components.ThemeToggle
+    FFI.Window
+    Pages.Forgot
+    Pages.Login
+    Pages.Members
+    Pages.Register
+    Pages.Reset
+    Supabase
+  hs-source-dirs:   app/auth
+  build-depends:
+    , aeson
+    , auth-pure
+    , base              <5
+    , bytestring
+    , containers
+    , ghc-experimental
+    , miso              >=1.10
+    , mtl
+    , text
+
+  default-language: GHC2021
+  ghc-options:      -O2 -Wall
+
+executable promise-test
+  import:           wasm
+  main-is:          Main.hs
+  hs-source-dirs:   app/promise-test
+  build-depends:
+    , base             <5
+    , ghc-experimental
+
+  default-language: GHC2021
+  ghc-options:      -O2 -Wall
+
+-- Native-GHC test-suite for the FFI-free pure logic. Run with plain
+-- `cabal test` (NOT wasm32-wasi-cabal); never builds miso or the WASM exes.
+test-suite frontend-tests
+  type:             exitcode-stdio-1.0
+  main-is:          Spec.hs
+  hs-source-dirs:   test
+  build-depends:
+    , auth-pure
+    , base            <5
+    , hedgehog
+    , hspec
+    , hspec-hedgehog
+    , text
+
+  default-language: GHC2021
+  ghc-options:      -Wall -threaded

@@ -30,7 +30,7 @@ async function createTestJwt(payload) {
 }
 
 describe("POST /auth/callback", () => {
-  it("sets cookies on valid token with role", async () => {
+  it("sets cookies and returns redirect JSON on valid token with role", async () => {
     const token = await createTestJwt({
       sub: "user-123",
       email: "test@example.com",
@@ -38,59 +38,59 @@ describe("POST /auth/callback", () => {
       app_metadata: { role: "friend" },
     });
 
-    const form = new FormData();
-    form.set("access_token", token);
-    form.set("refresh_token", "fake-refresh");
-    form.set("redirect", "/members");
-
     const resp = await SELF.fetch("https://example.com/auth/callback", {
       method: "POST",
-      body: form,
-      redirect: "manual",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        access_token: token,
+        refresh_token: "fake-refresh",
+        redirect: "/members",
+      }),
     });
 
-    expect(resp.status).toBe(302);
-    expect(resp.headers.get("Location")).toBe("/members");
+    expect(resp.status).toBe(200);
+    const body = await resp.json();
+    expect(body).toEqual({ ok: true, redirect: "/members" });
 
     const cookies = resp.headers.getAll("Set-Cookie");
     expect(cookies.some((c) => c.startsWith("sb_access_token="))).toBe(true);
     expect(cookies.some((c) => c.startsWith("sb_refresh_token="))).toBe(true);
   });
 
-  it("rejects invalid token", async () => {
-    const form = new FormData();
-    form.set("access_token", "invalid.token.here");
-    form.set("refresh_token", "fake-refresh");
-
+  it("rejects invalid token with 401 JSON", async () => {
     const resp = await SELF.fetch("https://example.com/auth/callback", {
       method: "POST",
-      body: form,
-      redirect: "manual",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        access_token: "invalid.token.here",
+        refresh_token: "fake-refresh",
+      }),
     });
 
-    expect(resp.status).toBe(302);
-    expect(resp.headers.get("Location")).toBe("/login?error=invalid");
+    expect(resp.status).toBe(401);
+    const body = await resp.json();
+    expect(body).toEqual({ ok: false, error: "invalid" });
   });
 
-  it("rejects pending user (no role)", async () => {
+  it("rejects pending user (no role) with 403 JSON", async () => {
     const token = await createTestJwt({
       sub: "user-456",
       email: "pending@example.com",
       exp: Math.floor(Date.now() / 1000) + 3600,
     });
 
-    const form = new FormData();
-    form.set("access_token", token);
-    form.set("refresh_token", "fake-refresh");
-
     const resp = await SELF.fetch("https://example.com/auth/callback", {
       method: "POST",
-      body: form,
-      redirect: "manual",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        access_token: token,
+        refresh_token: "fake-refresh",
+      }),
     });
 
-    expect(resp.status).toBe(302);
-    expect(resp.headers.get("Location")).toBe("/login?error=pending");
+    expect(resp.status).toBe(403);
+    const body = await resp.json();
+    expect(body).toEqual({ ok: false, error: "pending" });
   });
 });
 

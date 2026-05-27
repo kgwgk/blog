@@ -1,0 +1,56 @@
+# Syncs the Supabase auth email templates from the canonical Haskell design
+# source (static/src/Design) to the Supabase project via the Management API.
+#
+# MANUAL SETUP REQUIRED: add these two GitHub Actions secrets in the repo
+# settings (Settings -> Secrets and variables -> Actions). They cannot be set
+# from the repo and must be added by hand:
+#   - SUPABASE_ACCESS_TOKEN  Supabase personal access token (long-lived, for CI;
+#                            generate in the Supabase dashboard account settings)
+#   - SUPABASE_PROJECT_REF   the Supabase project ref
+name: sync-email-templates
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - "static/src/Design/**"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v30
+
+      - uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-site-${{ hashFiles('**/*.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-site-
+          gc-max-store-size-linux: 8G
+          purge: true
+          purge-prefixes: nix-${{ runner.os }}-site-
+          purge-created: 0
+          purge-primary-key: never
+          purge-last-accessed: 604800
+
+      - name: Generate email template payload
+        run: nix run .#emails > payload.json
+
+      - name: PATCH Supabase auth email templates
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          http_code=$(curl -sS -o response.json -w "%{http_code}" \
+            -X PATCH "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/config/auth" \
+            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data @payload.json)
+          echo "HTTP $http_code"
+          cat response.json
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "Supabase Management API PATCH failed"
+            exit 1
+          fi

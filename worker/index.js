@@ -11,6 +11,7 @@ import { registerPage } from "./pages/register.js";
 import { membersPage } from "./pages/members.js";
 import { forgotPasswordPage } from "./pages/forgot-password.js";
 import { resetPasswordPage } from "./pages/reset-password.js";
+import { pingSupabase } from "./keep-alive.js";
 
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
@@ -66,30 +67,41 @@ export default {
     // --- Auth API routes ---
 
     if (method === "POST" && pathname === "/auth/callback") {
-      const form = await request.formData();
-      const accessToken = form.get("access_token");
-      const refreshToken = form.get("refresh_token");
-      const redir = form.get("redirect") || "/";
+      const body = await request.json().catch(() => null);
+      const accessToken = body?.access_token;
+      const refreshToken = body?.refresh_token;
+      const redir = body?.redirect || "/";
 
       if (!accessToken || !refreshToken) {
-        return redirect("/login?error=invalid");
+        return new Response(JSON.stringify({ ok: false, error: "invalid" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
       }
 
       const payload = await verifySupabaseJwt(accessToken, env.SUPABASE_JWT_SECRET);
       if (!payload) {
-        return redirect("/login?error=invalid");
+        return new Response(JSON.stringify({ ok: false, error: "invalid" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
       }
 
       const role = payload.app_metadata?.role;
       if (!role) {
-        return redirect("/login?error=pending");
+        return new Response(JSON.stringify({ ok: false, error: "pending" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
       }
 
-      const headers = new Headers();
-      headers.set("Location", redir);
+      const headers = new Headers({ "Content-Type": "application/json" });
       headers.append("Set-Cookie", makeSessionCookie("sb_access_token", accessToken, COOKIE_MAX_AGE));
       headers.append("Set-Cookie", makeSessionCookie("sb_refresh_token", refreshToken, COOKIE_MAX_AGE));
-      return new Response(null, { status: 302, headers });
+      return new Response(JSON.stringify({ ok: true, redirect: redir }), {
+        status: 200,
+        headers,
+      });
     }
 
     if (pathname === "/auth/logout") {
@@ -150,5 +162,12 @@ export default {
     // --- Passthrough to static assets ---
 
     return env.ASSETS.fetch(request);
+  },
+
+  async scheduled(event, env, ctx) {
+    const result = await pingSupabase(env);
+    console.log(
+      `[keep-alive] supabase ping: ok=${result.ok} status=${result.status}`,
+    );
   },
 };

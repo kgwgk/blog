@@ -16,6 +16,8 @@
         root = root + /static;
         fileset = lib.fileset.unions [
           (root + /static/src)
+          (root + /static/app)
+          (root + /static/test)
           (root + /static/hcentner-blog.cabal)
         ];
       });
@@ -37,6 +39,14 @@
         hcentner-blog = {
           stan = true;
           haddock = false;
+        };
+        # Enable Hakyll's external link checker (`site check`). nixpkgs builds
+        # hakyll with this flag off (dropping http-conduit); we need it on so the
+        # `site` binary checks external links in CI. hakyll's own test suite hits
+        # the network when this flag is on, so skip it.
+        hakyll = {
+          check = false;
+          cabalFlags.checkExternal = true;
         };
         /*
         aeson = {

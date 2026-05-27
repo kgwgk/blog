@@ -2,6 +2,9 @@
 	"name": "blog",
 	"compatibility_date": "2025-12-17",
 	"main": "./index.js",
+	"triggers": {
+		"crons": ["0 12 */2 * *"]
+	},
 	"vars": {
 		"SUPABASE_URL": "YOUR_SUPABASE_URL",
 		"SUPABASE_ANON_KEY": "YOUR_SUPABASE_ANON_KEY"
